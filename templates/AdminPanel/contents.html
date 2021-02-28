@@ -1,0 +1,134 @@
+{% extends 'AdminPanel/base.html' %}
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Contents</h1>
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Downloads</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_downloads}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-download fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Contents</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_contents}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-file fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Categories</div>
+                      <div class="row no-gutters align-items-center">
+                        <div class="col-auto">
+                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{no_categories}}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Approvals</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_pending}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-check fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Row -->
+
+                    <div class="box box-primary">
+                        <div class="box-body">
+                            <table width="100%" class="table table-hover" id="dataTables-example">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Content ID</th>
+                                        <th>Name</th>
+                                        <th>Image</th>
+                                        <th>Category</th>
+                                        <th>Download Type</th>
+                                        <th>Rating</th>
+                                        <th>Total Downloads</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for x in contents %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{x.id}}</td>
+                                        <td>{{x.name}}</td>
+                                        <td><img style="height:50px; width:60px;" src="{{x.image_thumbnail.url}}"></td>
+                                        <td>{{x.category.name}}</td>
+                                        <td>
+                                          {% if x.price == 0 %}
+                                             Free
+                                         {% else %}
+                                             Paid
+                                         {% endif %}
+                                         </td>
+                                        <td>5*</td>
+                                        <td>766</td>
+                                        <td>
+                                           <a href="{% url 'admin_delete_content' x.id %}" type="submit" class="btn btn-outline-danger btn-rounded">Delete</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+        </div>
+        <!-- /.container-fluid -->
+{% endblock %}

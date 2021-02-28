@@ -1,0 +1,117 @@
+{% extends 'UserSide/base.html' %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div class="container bootstrap snippet mb-5 p-5">
+      <div class="row">
+          <div class="col-sm-12">
+                    <form class="form" action="{% url 'edit_userProfile' %}" method="POST" id="registrationForm"  enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="container">
+                            <div class="row">
+  
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-xs-6 form-group image-preview" id=imagePreview>   
+                                            {% for x in profile %}
+                                              <img style="height:20em !important; width:20em !important;" name="imageInput" src="{{x.ImageURL}}" class="image-preview__image avatar img-circle img-thumbnail" alt="avatar">
+                                              <span class="image-preview__default-text"></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
+                                       <div class="col-xs-6">
+                                            <label for="user_image"><h6 style="color:#FF5722;">Upload Profile Image</h6></label>
+                                            <input type="file" name="imageInput" id="imageInput" value="Upload" placeholder=""  class="foo">
+                                       </div>
+                                    </div>
+                                </div>
+  
+                                <div class="col-md-6">
+                                    <div class="form-group">
+  
+                                        <div class="col-xs-6" >
+                                            <label for="first_name"><h6 style="color:#FF5722;">First name</h6></label>
+                                            <input type="text" class="form-control" name="first_name" id="first_name" value="{{user.first_name}}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                           <label for="mobile"><h6 style="color:#FF5722;">Mobile</h6></label>
+                                            {% for x in profile %}
+                                            <input type="text" class="form-control" name="mobileNo" id="mobile" value="{{x.mobile_number}}" readonly>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+  
+                                        <div class="col-xs-6">
+                                            <label for="email"><h6 style="color:#FF5722;">Email</h6></label>
+                                            <input type="email" class="form-control" name="email" id="email" value="{{user.email}}" readonly>
+                                        </div>
+                                    </div>
+  
+                                    <div class="form-group">
+                                         <div class="col-xs-12">
+                                              <br>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                             <button class="btn btn-md btn-success" type="submit"><i class="glyphicon glyphicon-ok-sign"></i> Save Changes</button>
+                                          </div>
+                                    </div>
+  
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+          </div><!---Col sm -12-->
+      </div><!--row-->
+
+      {% if request.user.is_staff == True %}
+      <div class="row">
+        <div class="col-md-12">
+            <h3 style="font-size: 3vh;">Creator Account is Activated. Show my <a href="{% url 'creator' %}" style="color: #FF5722; text-decoration: none;">Dashboard</a></h3>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-md-12">
+            <h4>Want to be a creator? <a href="{% url 'activate_creator' %}">Click to activate</a> your creator account !!</h4>
+        </div>
+      </div>
+      {% endif %}
+  </div><!---/container-->
+  
+  <!----Image Preview While selection --->
+  <script>
+      const imageInput = document.getElementById("imageInput");
+      const previewContainer = document.getElementById("imagePreview");
+      const previewImage = previewContainer.querySelector(".image-preview__image");
+      const previewDefaultText = previewContainer.querySelector(".image-preview__default-text");
+  
+      imageInput.addEventListener("change", function(){
+          const file = this.files[0];
+  
+          if (file){
+              const reader = new FileReader();
+  
+              previewDefaultText.style.display = "none";
+              previewImage.style.display = "block";
+  
+              reader.addEventListener("load", function() {
+                  console.log(this);
+                  previewImage.setAttribute("src", this.result);
+  
+              });
+  
+              reader.readAsDataURL(file);
+  
+          } else {
+              previewDefaultText.style.display = null;
+              previewImage.style.display = null;
+              previewImage.setAttribute("src", "{{product.ImageURL}}");
+          }
+      });
+  </script>
+  
+
+{% endblock %}

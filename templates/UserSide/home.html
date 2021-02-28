@@ -1,0 +1,158 @@
+{% extends 'UserSide/base.html' %}
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<style>
+   
+    .gallery img {
+      border-radius: 8px;
+      box-shadow: 0 0 16px #333;
+      transition: all 1.5s ease;
+    }
+    .gallery img:hover {
+      box-shadow: 0 0 32px #333;
+    }
+    .gallery .content {
+      padding: 4px;
+    }
+    .gallery .gallery-item {
+      transition: grid-row-start 300ms linear;
+      transition: transform 300ms ease;
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+    .gallery .gallery-item:hover {
+      transform: scale(1.025);
+    }
+</style>
+
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-12 p-2">
+            <div class="alime-projects-menu">
+                <div class="portfolio-menu text-center" id="myBtnContainer">
+                    <button class="btn active" onclick="filterSelection('all')">All</button>
+                    <button class="btn" onclick="filterSelection('False')">Free</button>
+                    <button class="btn" onclick="filterSelection('True')">Paid</button>
+                    <button class="btn" onclick="filterSelection('top')">Top Rated</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="unlist p-5 post-wrapper gallery" >
+            {% for image in contents %}
+            <listli class="p-2 filterDiv {{image.price}} gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" alt="thumbnail"></a>
+            </listli>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 text-center " data-wow-delay="700ms">
+          <a id="loadmoreBtn" href="" class="btn alime-btn btn-2 mt-15">View More</a>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    $(document).ready(function(){
+      $("#loadmoreBtn").on('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var _currentResult= $(".post-box").length;
+        $.ajax({
+          url:"{% url 'load_more' %}",
+          type: 'POST',
+          data:{
+            'offset': _currentResult,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          dataType:'json',
+          beforeSend:function(){
+            $("#loadmoreBtn").addClass('disabled').text('Loading...')
+          },
+          success:function(res){
+            var _html='';
+            var json_data=$.parseJSON(res.posts);
+            $.each(json_data, function(index, data){
+              _html+='<listli class="p-2 post-box">\
+                <a href="/view-single/'+data.pk+'"><img src=/image/'+data.fields.image+' alt="thumbnail"></a>\
+            </listli>';
+            });
+            $(".post-wrapper").append(_html);
+            var _countTotal=$(".post-box").length;
+            if(_countTotal==res.totalResult){
+                $("#loadmoreBtn").remove(); 
+            }else{
+                $("#loadmoreBtn").removeClass('disabled').html('Load More') 
+            }
+          }
+        });
+      });
+    });
+
+
+
+filterSelection("all")
+function filterSelection(c) {
+  var x, i;
+  x = document.getElementsByClassName("filterDiv");
+  if (c == "all") c = "";
+  // Add the "show" class (display:block) to the filtered elements, and remove the "show" class from the elements that are not selected
+  for (i = 0; i < x.length; i++) {
+    w3RemoveClass(x[i], "show");
+    if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "show");
+  }
+}
+
+// Show filtered elements
+function w3AddClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    if (arr1.indexOf(arr2[i]) == -1) {
+      element.className += " " + arr2[i];
+    }
+  }
+}
+
+// Hide elements that are not selected
+function w3RemoveClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    while (arr1.indexOf(arr2[i]) > -1) {
+      arr1.splice(arr1.indexOf(arr2[i]), 1);
+    }
+  }
+  element.className = arr1.join(" ");
+}
+
+// Add active class to the current control button (highlight it)
+var btnContainer = document.getElementById("myBtnContainer");
+var btns = btnContainer.getElementsByClassName("btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("active");
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  });
+}
+
+
+
+  </script>
+
+
+{% endblock %}

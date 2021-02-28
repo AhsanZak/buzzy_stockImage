@@ -1,0 +1,42 @@
+{% extends 'UserSide/base.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+
+                    <div class="alime-contact-form mt-50">
+                        <h4 class="mb-30">Dont have an account?<a href="{% url 'register' %}" style="color:#fc6060">Register Here</a></h4>
+
+                        {% for message in messages %}
+                        <h5 style="color:red;">{{message}}</h5>
+                        {% endfor %}
+                        <form action="{% url 'login' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12 col-md-12">
+                                    <input type="text" name="username" class="form-control mb-30" placeholder="Username">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="password" name="password" class="form-control mb-30" placeholder="Password">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-2 mt-15">Login</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+  </div>
+</div>
+    
+
+{% endblock %}

@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+
+  <!-- Custom fonts for this template-->
+  <link href="{% static 'AdminPanel/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'AdminPanel/css/sb-admin-2.min.css' %}" rel="stylesheet">
+  <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
+
+
+</head>
+<body>
+  
+
+  <header class="" >
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" >
+    <a class="navbar-brand" href="/">Buzzy</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <ul class="navbar-nav ml-auto">
+            <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
+            <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
+            {% if request.user.is_authenticated %}
+            <list class="nav-item dropdown" >
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Profile
+                </a>
+                <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </list>
+            {% else %}
+            <list class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </list>
+            {% endif %}
+            <list class="nav-item">
+                <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
+            </list>
+        </ul>
+    </div>
+    </nav>
+</header>  
+
+    <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #fc6060 !important; background-image: none;">
+
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'creator' %}">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <!-- Heading -->
+      <div class="sidebar-heading">
+        Contents
+      </div>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>Manage contents</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header"></h6>
+            <a class="collapse-item" href="{% url 'creator_contents' %}">Contents</a>
+            <a class="collapse-item" href="{% url 'creator_upload' %}">Upload New Content</a>
+            <div class="collapse-divider"></div>
+          </div>
+        </div>
+      </li>
+
+
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+        </nav>
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+         <!-- Content Row -->
+          <div class="row">
+              <div class="col-md-6">
+                <div class="card-body text-center">
+                  <h6 class="mb-4 text-muted">Add a Wallpaper</h6>
+
+                  <form action="{% url 'creator_upload' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="wallpaper_name" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="category" placeholder="Category" required>
+                    </div>
+                    <input type="file" placeholder="Upload Image" name="image" accept="image/*" required>
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="description" placeholder="Image Description" required>
+                    </div>
+                    <div class="form-group">
+                      <div class="">
+                        <h6>By Default your content will be available for free.</h6>
+                        <h6> You can change it here. </h6>
+                        <select name="price" id="cars">
+                          <option value="free">Free</option>
+                          <option value="paid">Paid</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-primary shadow-2 mb-4">Add Image</button>
+                  </form>
+
+                </div>
+              </div>
+
+              <div class="col-md-6">
+
+              </div>
+          </div>
+          <!-- Content Row -->
+
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+    </div>
+    <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
+
+
+
+
+
+  <footer class="footer footer-area" style=" position: relative; top:0; left: 0; bottom: 0; width: 100%; text-align: center;">
+    <div class="container" >
+      <div class="row">
+        <div class="col-12">
+          <div class="footer-content d-flex align-items-center justify-content-between">
+  
+            <div class="copywrite-text">
+              <p>
+                Copyright &copy;<script data-cfasync="false" src=""></script><script>document.write(new Date().getFullYear());</script> All rights reserved.
+              </p>
+            </div>
+  
+            <div class="footer-logo">
+              <a href=""><img src="" alt=""></a>
+            </div>
+  
+            <div class="social-info">
+              <a href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a>
+              <a href="#"><i class="fab fa-twitter-alt" aria-hidden="true"></i></a>
+              <a href="#"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+              <a href="#"><i class="fab fa-pinterest" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'AdminPanel/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  
+  
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'AdminPanel/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+  
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
+  
+  
+</body>
+</html>

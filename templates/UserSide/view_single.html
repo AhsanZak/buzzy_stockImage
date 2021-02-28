@@ -1,0 +1,210 @@
+{% extends 'UserSide/base.html' %}
+{% block title %}View{% endblock %}
+{% load static %}
+{% load imagekit %}
+{% block content %}
+
+
+
+
+<!-- rating-modal -->
+
+<div class="modal fade" id="ratingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rate this Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'rate' content.id %}" name="rating">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <label for="rate">Select rating out of 5:</label>
+                    <select name="rate" id="rate">
+                        <option value="1" name="rate">1</option>
+                        <option value="2" name="rate">2</option>
+                        <option value="3" name="rate">3</option>
+                        <option value="4" name="rate">4</option>
+                        <option value="5" name="rate">5</option>
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="{% url 'rate' content.id %}">
+                        <button type="submit" class="btn btn-primary">Rate</button>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--rating-modal-->
+
+<!-- large-modal -->
+<div class="modal fade" id="large_imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{content.name}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img src="{{content.ImageURL}}">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--large-modal-->
+
+
+<div class="container">
+    <!-------Image Details-------->
+    <div class="row p-3">
+        <div class="col-md-6">
+            <div class=" cover">
+                <div class="col-xs-6 image-preview" id=imagePreview>   
+                    <a data-toggle="modal" data-target="#large_imageModal">
+                        <img style="max-height: 30rem;" class="img-responsive" src="{{content.ImageURL}}" alt="lklklklk">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="container">
+            <h5 style="color:#FF5722;">{{content.name}}</h5>
+            <h6>{{content.category.name}}</h6>
+            <hr>
+
+            <div class="col-xs-6" style="display: flex">
+            <h6>Rating &nbsp;:&nbsp;</h6>
+
+                <span class="fa fa-star {% if content.rate >= 1 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if content.rate >= 2 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if content.rate >= 3 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if content.rate >= 4 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if content.rate >= 5 %} checked {% endif %}"></span>
+            </div>
+
+            <p>{{content.description}}Another rainy day here
+                today - off for my Sunday run - at least it won't be hot - LOL.
+                Thanks for
+                stopping by - will be by to see you all when I return.</p>
+
+            <h6>Uploded By : <a href="{% url 'view_creator' content.user %}" style="text-decoration: none;">{{content.user}}</a></h6>
+            <h6>Shot On : {{content.camera}}Canon EOS Digital</h6>
+            <hr>
+            
+            <div class="row align-items-end">
+                <div class="col-xs-4 p-2">
+                    <div data-wow-delay="700ms" data-toggle="modal"
+                    data-target="#ratingModal">
+                        <a href="#" class="btn btn-primary">Rate this
+                            Image</a>
+                    </div>           
+               </div>
+               <div class="col-xs-4 p-2">
+                    <a class="btn btn-primary" href="">Save</a>
+                </div>
+                <div class="col-xs-4 p-2">
+                        <a href="{{content.ImageURL}}" class="btn btn-success" id="download" download>Download</a>
+                </div>
+                
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-------Image Details-------->
+    <hr>
+
+    <!--------Other Images with same category---------->
+    <div class="row p-2">
+        <div class="col-md-12 pl-3">
+        <h4>Similar Images</h4>
+        </div>
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
+            {% for image in contents %}
+            <listli class="p-2 free gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" alt="thumbnail"></a>
+            </listli>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
+        <div class="col-md-12 p-2 text-center">
+            <a class="btn btn-dark"  href="">See More</a>
+        </div> 
+    </div>
+    <!--------Other Images with same category---------->
+
+    <hr>
+
+    <!-------Other IMages------->
+    <div class="row p-2">
+        <div class="col-md-12 pl-3">
+        <h4 >More from this Artist </h4>
+        </div>
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
+            {% for image in contents %}
+            <listli class="p-2 free gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" alt="thumbnail"></a>
+            </listli>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
+        <div class="col-md-12 p-2 text-center">
+            <a class="btn btn-dark" href="">See More</a>
+        </div> 
+    </div>
+    <!-------Other IMages------->
+
+</div>
+
+
+<script>
+
+$(document).ready(function() {
+  $("#myCarousel").on("slide.bs.carousel", function(e) {
+    var $e = $(e.relatedTarget);
+    var idx = $e.index();
+    var itemsPerSlide = 3;
+    var totalItems = $(".carousel-item").length;
+
+    if (idx >= totalItems - (itemsPerSlide - 1)) {
+      var it = itemsPerSlide - (totalItems - idx);
+      for (var i = 0; i < it; i++) {
+        // append slides to end
+        if (e.direction == "left") {
+          $(".carousel-item")
+            .eq(i)
+            .appendTo(".carousel-inner");
+        } else {
+          $(".carousel-item")
+            .eq(0)
+            .appendTo($(this).find(".carousel-inner"));
+        }
+      }
+    }
+  });
+});
+
+
+</script>
+
+
+
+{% endblock %}
+

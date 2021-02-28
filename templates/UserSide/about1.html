@@ -1,0 +1,146 @@
+{% extends 'UserSide/base.html' %}
+{% load static %}
+{% load imagekit %}
+
+{% block title %} About {% endblock %}
+
+{% block links %}
+<!-- Template CSS -->
+<link rel="stylesheet" href="{% static 'User/assets/css/style-starter.css' %}">
+{% endblock %}
+
+{% block content %}
+  <!-- banner -->
+<section>
+    <div class="container py-5" style="background-color: #fc6060; padding-top: 5em !important">
+        <div class="banner-text py-md-4">
+            <div class="row banner-info">
+                <div class="col-lg-7 w3pvt-logo align-self">
+                    <h2>Buzzy is the # 1 phone personalization app in the world and helps you make sure your phone reflects you.</h2>
+                    <form>
+                        <button type="submit" class="btn" style="width:fit-content"><a href="{% url 'home' %}" style="color:white">Open Web App</a></button>
+                    </form>
+                </div>
+                <div class="col-lg-5 col-md-7 mt-lg-0 mt-4">
+                    <img src="{% static 'User/assets/images/screenshot.png' %}" alt="" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //banner -->
+
+  <!-- Top Creators -->
+<section class="w3l-features py-5" id="features">
+    <div class="call-w3 py-lg-5 py-md-4">
+        <div class="container">
+            <div class="row main-cont-wthree-2">
+                <div class="col-lg-6 feature-grid-left">
+                    <h3 class="title-big mb-4">Our Top Creators</h3>
+                    <ol class="w3l-right mt-4 mb-0">
+                        <li>Suspendisse non sed consequat magna a velit commodo</li>
+                        <li>Fusce eget ex fermentum, ultricies nisi ac sed et, init dolor sit</li>
+                        <li>Quisque venenatis eros et, init commodo risus amet.</li>
+                        <li>Suspendisse non sed consequat magna a velit</li>
+                    </ol>
+
+                    <a href="" class="btn btn-primary btn-style mt-md-5 mt-4" style="background-color: #fc6060">Be an Artist</a>
+                </div>
+                <div class="col-lg-6 feature-grid-right mt-lg-0 mt-5">
+                    <div class="call-grids-w3 d-grid">
+                        <div class="grids-1 box-wrap">
+                            <h4><a href="#feature" class="title-head">Gassali</a></h4>
+                            <p>Vivamus a ligula quam. Ut blandit eu leo non. Duis sed doloramet laoreet.</p>
+                        </div>
+                        <div class="grids-1 box-wrap">
+                            <h4><a href="#feature" class="title-head">Shaheen</a></h4>
+                            <p>Vivamus a ligula quam. Ut blandit eu leo non. Duis sed dolor amet laoreet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //Top Creators -->
+
+
+  <!-- middle -->
+	<div class="middle py-5">
+		<div class="container py-xl-5 py-lg-3">
+			<div class="welcome-left text-center py-md-3">
+                <h3 class="mb-4">This Mobile App is available for all devices. <br> i.e, Android and apple devices</h3>
+                <a href="#url"><img src="assets/images/android-store.png" alt="" width="170px" class="img-fluid"></a>
+				<a href="#url"><img src="assets/images/apple-store.png" alt="" width="220px" class="img-fluid"></a>
+				<p class="text-italic">* Available on iPhone, iPad and all Android devices</p>
+			</div>
+		</div>
+	</div>
+	<!-- //middle -->
+
+<!-- stats -->
+<section class="w3l-stats py-5" id="stats">
+    <div class="gallery-inner container py-md-5 py-4">
+        <div class="row stats-con">
+            <div class="col-md-3 col-6 stats_info counter_grid">
+                <span class="fa fa-users"></span>
+                <p class="counter">2020</p>
+                <h3>Customers</h3>
+            </div>
+            <div class="col-md-3 col-6 stats_info counter_grid1">
+                <span class="fa fa-download"></span>
+                <p class="counter">120</p>
+                <h3>Downloads</h3>
+            </div>
+            <div class="col-md-3 col-6 stats_info counter_grid mt-md-0 mt-5">
+                <span class="fa fa-smile-o"></span>
+                <p class="counter">1500</p>
+                <h3>Satisfied</h3>
+            </div>
+            <div class="col-md-3 col-6 stats_info counter_grid1 mt-md-0 mt-5">
+                <span class="fa fa-coffee"></span>
+                <p class="counter">120</p>
+                <h3>Cups of coffee</h3>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //stats -->
+
+  <script src="{% static 'User/assets/js/jquery-3.3.1.min.js' %}"></script><!-- default jQuery -->
+<!-- stats number counter-->
+  <script src="{% static 'User/assets/js/jquery.waypoints.min.js' %}"></script>
+  <script src="{% static 'User/assets/js/jquery.countup.js' %}"></script>
+  <script>
+    $('.counter').countUp();
+  </script>
+  <!-- //stats number counter -->
+
+<script>
+  $(document).ready(function () {
+    $("#owl-demo1").owlCarousel({
+      loop: true,
+      margin: 0,
+      nav: false,
+      responsiveClass: true,
+      responsive: {
+        0: {
+          items: 2,
+          nav: false
+        },
+        736: {
+          items: 3,
+          nav: false
+        },
+        1000: {
+          items: 4,
+          nav: false,
+          loop: false
+        }
+      }
+    })
+  })
+</script>
+<!-- //script for tesimonials carousel slider -->
+
+{% endblock %}

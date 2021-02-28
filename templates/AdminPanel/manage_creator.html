@@ -1,0 +1,97 @@
+{% extends 'AdminPanel/base.html' %}
+{% block content %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800"></h1>
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Creators</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_creators}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Blocked Creators</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_blocked}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-ban fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- Content Row -->
+
+                    <div class="box box-primary">
+                        <div class="box-body">
+                            <table width="100%" class="table table-hover" id="dataTables-example">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Username</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile No.</th>
+                                        <th>Block/Unblock</th>
+                                        <th></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for x in user %}
+                                    <tr>
+                                        <td>{{x.id}}</td>
+                                        <td>{{x.username}}</td>
+                                        <td>{{x.first_name}}</td>
+                                        <td>{{x.email}}</td>
+                                        <td>{{x.last_name}}</td>
+                                        <td>
+                                          {% if x.is_active == True %}
+                                            <a href="{% url 'block_creator' x.id %}" class="btn btn-outline-danger btn-rounded"><i class="fas fa-ban"></i></a>
+                                          {% else %}
+                                            <a href="{% url 'block_creator' x.id %}" class="btn btn-outline-success btn-rounded"><i class="fas fa-check"></i></a>
+                                          {% endif %}                                        </td>
+                                        <td class="text-right">
+                                            <a href="{% url 'update_user' x.id %}" class="btn btn-outline-info btn-rounded"><i class="fas fa-pen"></i></a>
+                                            <a href="{% url 'delete_user' x.id %}" type="submit" class="btn btn-outline-danger btn-rounded"><i class="fas fa-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+{% endblock %}

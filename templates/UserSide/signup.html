@@ -1,0 +1,47 @@
+{% extends 'UserSide/base.html' %}
+{% block title %} Signup {% endblock %}
+
+{% block content %}
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="alime-contact-form mt-50">
+                        <h4 class="mb-30">Have an account?<a href="{% url 'login' %}" style="color:#fc6060">Login</a></h4>
+                        {% for message in messages %}
+                        <h5 style="color:red;">{{message}}</h5>
+                        {% endfor %}
+                        <form action="{% url 'register' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row p-3">
+                                <div class="col-12 col-md-12">
+                                    <input type="text" name="first_name" class="form-control mb-30" placeholder="First Name">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="text" name="last_name" class="form-control mb-30" placeholder="Last Name">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="text" name="username" class="form-control mb-30" placeholder="User Name">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="number" name="mobile_no" class="form-control mb-30" placeholder="Mobile Number">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="password" name="password1" class="form-control mb-30" placeholder="Password">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="password" name="password2" class="form-control mb-30" placeholder="Password">
+                                </div>
+                                <div class="col-12 col-md-12">
+                                    <input type="email" name="email" class="form-control mb-30" placeholder="Email">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-2 mt-15">Register</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
