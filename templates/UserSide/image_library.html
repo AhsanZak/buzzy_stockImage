@@ -1,0 +1,29 @@
+{% extends 'UserSide/base.html' %}
+{% block title %}Library{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+    </div>
+    <div class="row p-2">
+        <div class="col-md-12 pl-3">
+        <h4>Your Downloaded Images</h4>
+        </div>
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
+            {% for image in contents %}
+            <listli class="p-2 free gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+            </listli>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
+        <div class="col-md-12 p-2 text-center">
+            <a class="btn btn-dark"  href="">See More</a>
+        </div> 
+    </div>
+</div>
+
+{% endblock %}

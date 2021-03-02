@@ -40,7 +40,6 @@
   .btn {
     border: none;
     outline: none;
-    padding: 12px 16px;
     cursor: pointer;
   }
   
@@ -88,7 +87,7 @@
 
 /* width */
 ::-webkit-scrollbar {
-width: 0.8em;
+width: 0.6em;
 }
 
 /* Track */
@@ -105,49 +104,51 @@ border-radius: 10px;
 </style>
 
 <body>
-  
-<header class="" >
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" >
-    <a class="navbar-brand" href="/">Buzzy</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
+        <div class="flex-grow-1 d-flex">
+            <form class="form-inline mx-0 mx-lg-auto rounded">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            
 
         <ul class="navbar-nav ml-auto">
-            <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
-            <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
-            {% if request.user.is_authenticated %}
-            <list class="nav-item dropdown" >
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Profile
-                </a>
-                <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
-                {% if request.user.is_staff == True %}
-                <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
-                {% endif %}
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                </div>
-            </list>
-            {% else %}
-            <list class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-            </list>
-            {% endif %}
-            <list class="nav-item">
-                <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
-            </list>
-        </ul>
-    </div>
+          <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
+          <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
+          {% if request.user.is_authenticated %}
+          <list class="nav-item dropdown" >
+              <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Profile
+              </a>
+              <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              {% if request.user.is_staff == True %}
+              <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+              </div>
+          </list>
+          {% else %}
+          <list class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </list>
+          {% endif %}
+          <list class="nav-item">
+              <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
+          </list>
+      </ul>
+        </div>
     </nav>
-</header>  
+</header>
 
 
 {% block content %}

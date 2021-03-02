@@ -24,6 +24,7 @@
     .gallery .gallery-item:hover {
       transform: scale(1.025);
     }
+
 </style>
 
 
@@ -33,10 +34,10 @@
         <div class="col-12 p-2">
             <div class="alime-projects-menu">
                 <div class="portfolio-menu text-center" id="myBtnContainer">
-                    <button class="btn active" onclick="filterSelection('all')">All</button>
-                    <button class="btn" onclick="filterSelection('False')">Free</button>
-                    <button class="btn" onclick="filterSelection('True')">Paid</button>
-                    <button class="btn" onclick="filterSelection('top')">Top Rated</button>
+                    <button name="option" type="submit" id="all" class="btn active" >All</button>
+                    <button name="option" type="submit" id="free" class="btn">Free</button>
+                    <button name="option" type="submit" id="paid" class="btn">Paid</button>
+                    <button name="option" type="submit" id="top" class="btn">Top Rated</button>
                 </div>
             </div>
         </div>
@@ -45,8 +46,8 @@
     <div class="row">
         <div class="unlist p-5 post-wrapper gallery" >
             {% for image in contents %}
-            <listli class="p-2 filterDiv {{image.price}} gallery-item post-box">
-                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" alt="thumbnail"></a>
+            <listli class="p-2 {{image.price}} gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
             </listli>
             {% endfor %}
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
@@ -56,7 +57,7 @@
 
     <div class="row">
         <div class="col-12 text-center " data-wow-delay="700ms">
-          <a id="loadmoreBtn" href="" class="btn alime-btn btn-2 mt-15">View More</a>
+          <a id="loadmoreBtn" href="" class="btn btn-dark">View More</a>
         </div>
     </div>
 
@@ -64,16 +65,43 @@
 
 
 <script>
+    let currentFilter = 'all';
     $(document).ready(function(){
       $("#loadmoreBtn").on('click', function(e){
         e.preventDefault();
         e.stopPropagation();
         var _currentResult= $(".post-box").length;
-        $.ajax({
+        loadData(_currentResult, currentFilter, true);
+      });
+    });
+
+    $("#all").on('click', function(e){
+        currentFilter = 'all';
+        loadData(0, currentFilter);
+      });
+
+      $("#free").on('click', function(e){
+        currentFilter = 'free';
+        loadData(0, currentFilter);
+      });
+
+      $("#paid").on('click', function(e){
+        currentFilter = 'paid';
+        loadData(0, currentFilter);
+      });
+
+      $("#top").on('click', function(e){
+        currentFilter = 'top';
+        loadData(0, currentFilter);
+      });
+
+    function loadData(_currentResult, filter, append){
+      $.ajax({
           url:"{% url 'load_more' %}",
-          type: 'POST',
+          type: 'GET',
           data:{
             'offset': _currentResult,
+            'filter': filter,
             csrfmiddlewaretoken: '{{ csrf_token }}',
           },
           dataType:'json',
@@ -85,11 +113,16 @@
             var json_data=$.parseJSON(res.posts);
             $.each(json_data, function(index, data){
               _html+='<listli class="p-2 post-box">\
-                <a href="/view-single/'+data.pk+'"><img src=/image/'+data.fields.image+' alt="thumbnail"></a>\
+                <a href="/view-single/'+data.pk+'"><img src=/image/'+data.fields.image+' class="wow-image" alt="thumbnail"></a>\
             </listli>';
             });
+            if(append){
             $(".post-wrapper").append(_html);
+            }else{
+            $(".post-wrapper").html(_html);}
             var _countTotal=$(".post-box").length;
+            console.log(_countTotal + "total count");
+            console.log(res.totalResult + "total REaulst");
             if(_countTotal==res.totalResult){
                 $("#loadmoreBtn").remove(); 
             }else{
@@ -97,62 +130,29 @@
             }
           }
         });
-      });
-    });
-
-
-
-filterSelection("all")
-function filterSelection(c) {
-  var x, i;
-  x = document.getElementsByClassName("filterDiv");
-  if (c == "all") c = "";
-  // Add the "show" class (display:block) to the filtered elements, and remove the "show" class from the elements that are not selected
-  for (i = 0; i < x.length; i++) {
-    w3RemoveClass(x[i], "show");
-    if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "show");
-  }
-}
-
-// Show filtered elements
-function w3AddClass(element, name) {
-  var i, arr1, arr2;
-  arr1 = element.className.split(" ");
-  arr2 = name.split(" ");
-  for (i = 0; i < arr2.length; i++) {
-    if (arr1.indexOf(arr2[i]) == -1) {
-      element.className += " " + arr2[i];
     }
-  }
-}
-
-// Hide elements that are not selected
-function w3RemoveClass(element, name) {
-  var i, arr1, arr2;
-  arr1 = element.className.split(" ");
-  arr2 = name.split(" ");
-  for (i = 0; i < arr2.length; i++) {
-    while (arr1.indexOf(arr2[i]) > -1) {
-      arr1.splice(arr1.indexOf(arr2[i]), 1);
-    }
-  }
-  element.className = arr1.join(" ");
-}
-
-// Add active class to the current control button (highlight it)
-var btnContainer = document.getElementById("myBtnContainer");
-var btns = btnContainer.getElementsByClassName("btn");
-for (var i = 0; i < btns.length; i++) {
-  btns[i].addEventListener("click", function() {
-    var current = document.getElementsByClassName("active");
-    current[0].className = current[0].className.replace(" active", "");
-    this.className += " active";
-  });
-}
-
-
 
   </script>
+
+  <!-------Search-Button-Ajax------->
+
+  <script>
+
+  $("#search").on('click', function(e){
+    var option = $().val();
+    console.log("option : " + option + "... before ajax call")
+
+    $.ajax({
+      url: '/search/' + option,
+      dataType: "json",
+      success: function (data){
+
+      }
+    })
+  })
+
+  </script>
+
 
 
 {% endblock %}

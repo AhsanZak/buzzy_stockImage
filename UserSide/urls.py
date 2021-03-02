@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.conf import settings
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -10,6 +11,7 @@ urlpatterns = [
     path('register', views.register, name="register"),
     path('logout', views.logout, name="logout"),
 
+    # path('serach/', views.search, name="search"),
     path('view-creator/<str:user>/', views.view_creator, name="view_creator"),
 
     path('activate-creator/', views.activate_creator, name="activate_creator"),
@@ -27,6 +29,9 @@ urlpatterns = [
     path('view-single/<int:image_id>', views.view_single, name="view_single"),
     path('rate/<int:image_id>', views.rate, name="rate"),
     path('download-image/', views.download_image, name="download_image"),
+
+    path('lalala/', views.send_file, name="sdkjf"),
+
     path('downloads', views.downloads, name="downloads"),
     path('payment-page', views.payment_page, name="payment_page")
 ]

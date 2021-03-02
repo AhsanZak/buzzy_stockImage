@@ -28,3 +28,4 @@ class ImageDetail(models.Model):
             url = ''
         return url
 
+

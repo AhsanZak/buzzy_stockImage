@@ -14,9 +14,14 @@ from PIL import Image
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import FileResponse
 
 
-
+def send_file(response):
+    img = open('C:/Users/ahsan/Downloads/pexels-harrison-candlin-2441454.jpg', 'rb')
+    response = FileResponse(img)
+    print("sdfsf")
+    return response
 
 def home(request):
     contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
@@ -45,15 +50,27 @@ def home(request):
                         {'section': 'images', 'contents': contents})
                 
 
-
 def load_more(request):
-    offset = int(request.POST['offset'])
+    offset = int(request.GET['offset'])
+    filter = request.GET['filter']
     limit = 2
-    posts = ImageDetail.objects.all()[offset:limit+offset]
+    if filter == 'all':
+        posts = ImageDetail.objects.all()
+        totalData = len(posts)
+        posts = posts[offset:limit+offset]
+    elif filter == 'free':
+        posts = ImageDetail.objects.filter(price=False)
+        totalData = len(posts)
+        posts = posts[offset:limit+offset]
+    elif filter == 'paid':
+        posts = ImageDetail.objects.filter(price=True)
+        totalData = len(posts)
+        posts = posts[offset:limit+offset]
+    elif filter == 'top':
+        posts = ImageDetail.objects.filter(rate__range=(3,5))
+        totalData = len(posts)
+        posts = posts[offset:limit+offset]
 
-    print("Posts Json ", posts)
-
-    totalData = ImageDetail.objects.count()
     data={}
     posts_json = serializers.serialize('json', posts)
 
@@ -278,10 +295,15 @@ def edit_userProfile(request):
 def download_image(request):
     if request.user.is_authenticated:
         image = ImageDetail.objects.get(id=request.POST['id'])
-        Order.objects.create(image=image, transaction_id=uuid.uuid4(), order_status='success', payment_mode='free',
+        if Downloads.objects.filter(image=image):
+            result = "ALreadry Downloaded"
+            print("already downloaded")
+        else:
+            Downloads.objects.create(image=image, transaction_id=uuid.uuid4(), status='success', payment_mode='free',
                              user=request.user)
-        data = 'success'
-        return JsonResponse({"data": data}, safe=False)
+            result = "success"
+            print("success")
+        return JsonResponse({'result': result}, safe=False)
     else:
         return redirect(login)
 
@@ -295,6 +317,7 @@ def payment_page(request):
 
 def downloads(request):
     if request.user.is_authenticated:
-        return render(request, 'UserSide/downloads.html')
+        contents = ImageDetail.objects.all()
+        return render(request, 'UserSide/image_library.html', {'contents': contents})
     else:
         return redirect(login)
