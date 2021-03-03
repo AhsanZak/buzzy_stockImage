@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'AdminPanel',
     'UserSide',
     'imagekit',
+    'watermarker'
 ]
 
 MIDDLEWARE = [
@@ -81,9 +82,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'buzzy_Image',
-        'USER' : 'postgres',
+        'USER': 'postgres',
         'PASSWORD': '1234',
-        'HOST' : 'localhost',
+        'HOST': 'localhost',
     }
 }
 

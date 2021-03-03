@@ -21,51 +21,55 @@
 <body>
   
 
-  <header class="" >
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" >
-    <a class="navbar-brand" href="/">Buzzy</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+ <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: #343a40!important">
+        <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
+        <div class="flex-grow-1 d-flex">
+            <form class="form-inline mx-0 mx-lg-auto rounded">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
 
         <ul class="navbar-nav ml-auto">
-            <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
-            <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
-            {% if request.user.is_authenticated %}
-            <list class="nav-item dropdown" >
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Profile
-                </a>
-                <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
-                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-            </list>
-            {% else %}
-            <list class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-            </list>
-            {% endif %}
-            <list class="nav-item">
-                <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
-            </list>
-        </ul>
-    </div>
+          <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
+          <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
+          {% if request.user.is_authenticated %}
+          <list class="nav-item dropdown" >
+              <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Profile
+              </a>
+              <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              {% if request.user.is_staff == True %}
+              <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+              </div>
+          </list>
+          {% else %}
+          <list class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </list>
+          {% endif %}
+          <list class="nav-item">
+              <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
+          </list>
+      </ul>
+        </div>
     </nav>
-</header>  
+</header>
 
     <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #fc6060 !important; background-image: none;">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #343a40 !important; background-image: none;">
 
 
       <!-- Divider -->
@@ -174,10 +178,6 @@
         <!-- /.container-fluid -->
       </div>
       <!-- End of Main Content -->
-    </div>
-    <!-- End of Content Wrapper -->
-  </div>
-  <!-- End of Page Wrapper -->
 
 
 
@@ -188,17 +188,17 @@
       <div class="row">
         <div class="col-12">
           <div class="footer-content d-flex align-items-center justify-content-between">
-  
+
             <div class="copywrite-text">
               <p>
                 Copyright &copy;<script data-cfasync="false" src=""></script><script>document.write(new Date().getFullYear());</script> All rights reserved.
               </p>
             </div>
-  
+
             <div class="footer-logo">
               <a href=""><img src="" alt=""></a>
             </div>
-  
+
             <div class="social-info">
               <a href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a>
               <a href="#"><i class="fab fa-twitter-alt" aria-hidden="true"></i></a>
@@ -210,7 +210,13 @@
       </div>
     </div>
   </footer>
-  
+
+
+
+    </div>
+    <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
   
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>

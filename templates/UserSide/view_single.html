@@ -1,7 +1,6 @@
 {% extends 'UserSide/base.html' %}
 {% block title %}View{% endblock %}
-{% load static %}
-{% load imagekit %}
+{% load watermark %}
 {% block content %}
 
 
@@ -57,7 +56,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="{{content.ImageURL}}" style="height: 100%; width: 100%;">
+                <img src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image" style="height: 100%; width: 100%;">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -73,9 +72,10 @@
     <div class="row p-3">
         <div class="col-md-6">
             <div class=" cover">
-                <div class="col-xs-6 image-preview" id=imagePreview>   
+                <div class="col-xs-6 image-preview" id=imagePreview>
                     <a data-toggle="modal" data-target="#large_imageModal">
-                        <img style="max-height: 30rem;" class="img-responsive" src="{{content.ImageURL}}" alt="lklklklk">
+                        <img style="max-height: 30rem;" class="img-responsive" src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image">
+
                     </a>
                 </div>
             </div>
@@ -105,14 +105,14 @@
             <h6>Uploded By : <a href="{% url 'view_creator' content.user %}" style="text-decoration: none;">{{content.user}}</a></h6>
             <h6>Shot On : {{content.camera}}Canon EOS Digital</h6>
             <hr>
-            
+
             <div class="row align-items-end ">
                 <div class="col-xs-4 p-2">
                     <div data-wow-delay="700ms" data-toggle="modal"
                     data-target="#ratingModal">
                         <a href="#" class="btn btn-primary">Rate this
                             Image</a>
-                    </div>           
+                    </div>
                </div>
                <div class="col-xs-4 p-2">
                     <a class="btn btn-primary" href="">Save</a>
@@ -123,10 +123,10 @@
                 </div>
                 {% else %}
                 <div class="col-xs-4 p-2">
-                    <a href="{{content.ImageURL}}" class="btn btn-danger" id="download" download> <i class="fa fa-dollar"></i> Download</a>
+                    <a href="{% url 'payment_page' %}" class="btn btn-danger" id="download" ><i class="fa fa-dollar"></i> Download</a>
                 </div>
                 {% endif %}
-                
+
             </div>
             </div>
         </div>
@@ -150,7 +150,7 @@
         </div>
         <div class="col-md-12 p-2 text-center">
             <a class="btn btn-dark"  href="">See More</a>
-        </div> 
+        </div>
     </div>
     <!--------Other Images with same category---------->
 
@@ -172,7 +172,7 @@
         </div>
         <div class="col-md-12 p-2 text-center">
             <a class="btn btn-dark" href="">See More</a>
-        </div> 
+        </div>
     </div>
     <!-------Other IMages------->
 
@@ -203,7 +203,7 @@ $('#download').click(function () {
                }else if(data.result == 'Already Downloaded'){
                 console.log("Error")
                }else{
-                   
+
                }
             }
         })

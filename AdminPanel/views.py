@@ -6,13 +6,13 @@ import base64
 # importing Image class from PIL package
 from PIL import Image
 from UserSide.models import UserDetail
-
+from django.contrib.auth.models import User, auth
 
 # Create your views here.
 
 
 def admin_panel(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         no_total = ImageDetail.objects.all().count()
         no_pending = ImageDetail.objects.filter(approval="pending").count()
 
@@ -22,34 +22,34 @@ def admin_panel(request):
 
 
 def login(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         return redirect(admin_panel)
-    else:
-        if request.method == 'POST':
-            admin = request.POST.get('username')
-            password = request.POST.get('password')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
 
-            if admin == 'admin' and password == '12345':
-                request.session['password'] = password
-                return redirect(admin_panel)
-            else:
-                messages.info(request, "Invalid Credentials")
-                return render(request, 'AdminPanel/login.html')
+        user = auth.authenticate(username=username, password=password)
 
+        if user is not None:
+            auth.login(request, user)
+            return redirect(admin_panel)
         else:
+            messages.info(request, "Invalid credentials")
             return render(request, 'AdminPanel/login.html')
+    else:
+        return render(request, 'AdminPanel/login.html')
 
 
 def logout(request):
-    request.session.flush()
+    auth.logout(request)
     return redirect(admin_panel)
 
 
 def manage_user(request):
-    if request.session.has_key('password'):
-        no_users = UserDetail.objects.all().count()
+    if request.user.is_authenticated and request.user.is_superuser == True:
+        no_users = UserDetail.objects.filter(is_superuser=False).count()
         no_blocked = UserDetail.objects.filter(is_active=False).count()
-        details = UserDetail.objects.all().order_by('id')
+        details = UserDetail.objects.filter(is_superuser=False).order_by('id')
         return render(request, 'AdminPanel/manage_user.html',
                       {'user': details, 'no_users': no_users, 'no_blocked': no_blocked})
     else:
@@ -57,7 +57,7 @@ def manage_user(request):
 
 
 def create_user(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         if request.method == 'POST':
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
@@ -90,7 +90,7 @@ def create_user(request):
 
 
 def block_user(request, user_id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         user = UserDetail.objects.get(id=user_id)
         if user.is_active == True:
             user.is_active = False
@@ -104,7 +104,7 @@ def block_user(request, user_id):
 
 
 def block_creator(request, user_id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         user = UserDetail.objects.get(id=user_id)
         if user.is_active == True:
             user.is_active = False
@@ -118,7 +118,7 @@ def block_creator(request, user_id):
 
 
 def update_user(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         user = UserDetail.objects.get(id=id)
         return render(request, 'AdminPanel/update_user.html', {'details': user})
     else:
@@ -126,7 +126,7 @@ def update_user(request, id):
 
 
 def edit_user(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         if request.method == 'POST':
             user = UserDetail.objects.get(id=id)
             user.first_name = request.POST['first_name']
@@ -142,7 +142,7 @@ def edit_user(request, id):
 
 
 def delete_user(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         user = UserDetail.objects.get(id=id)
         user.delete()
         return redirect(manage_user)
@@ -151,7 +151,7 @@ def delete_user(request, id):
 
 
 def add_creator(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         if request.method == 'POST':
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
@@ -182,17 +182,17 @@ def add_creator(request):
 
 
 def manage_creator(request):
-    if request.session.has_key('password'):
-        user = UserDetail.objects.filter(is_staff=True)
+    if request.user.is_authenticated and request.user.is_superuser == True:
+        user = UserDetail.objects.filter(is_staff=True, is_superuser=False)
         no_blocked = UserDetail.objects.filter(is_staff=True, is_active=False).count()
-        no_creators = UserDetail.objects.filter(is_staff=True).count()
+        no_creators = UserDetail.objects.filter(is_staff=True, is_superuser=False).count()
         return render(request, 'AdminPanel/manage_creator.html', {'user': user, 'no_blocked': no_blocked, 'no_creators': no_creators})
     else:
         return redirect(admin_panel)
 
 
 def category(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         categories = Category.objects.all()
 
         return render(request, 'AdminPanel/manage_category.html', {'categories': categories})
@@ -201,7 +201,7 @@ def category(request):
 
 
 def add_category(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         name = request.POST['name']
         Category.objects.create(name=name)
         return redirect(category)
@@ -210,7 +210,7 @@ def add_category(request):
 
 
 def delete_category(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         category = Category.objects.get(id=id)
         category.delete()
         return redirect(category)
@@ -219,7 +219,7 @@ def delete_category(request, id):
 
 
 def contents(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         contents = ImageDetail.objects.all()
         no_contents = ImageDetail.objects.all().count()
         no_pending = ImageDetail.objects.filter(approval="pending").count()
@@ -232,7 +232,7 @@ def contents(request):
 
 
 def add_contents(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         if request.method == 'POST':
             name = request.POST['wallpaper_name']
             price = request.POST['price']
@@ -250,7 +250,7 @@ def add_contents(request):
 
 
 def approve_contents(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         contents = ImageDetail.objects.filter(approval="pending")
         no_contents = ImageDetail.objects.all().count()
         no_pending = ImageDetail.objects.filter(approval="pending").count()
@@ -263,7 +263,7 @@ def approve_contents(request):
 
 
 def disapprove_contents(request):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         contents = ImageDetail.objects.filter(approval="approved")
         no_contents = ImageDetail.objects.all().count()
         no_pending = ImageDetail.objects.filter(approval="pending").count()
@@ -275,7 +275,7 @@ def disapprove_contents(request):
 
 
 def approved_contents(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         content = ImageDetail.objects.get(id=id)
         content.approval = "approved"
         content.save()
@@ -285,7 +285,7 @@ def approved_contents(request, id):
 
 
 def disapproved_contents(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         content = ImageDetail.objects.get(id=id)
         content.approval = "pending"
         content.save()
@@ -295,7 +295,7 @@ def disapproved_contents(request, id):
 
 
 def admin_delete_content(request, id):
-    if request.session.has_key('password'):
+    if request.user.is_authenticated and request.user.is_superuser == True:
         content = ImageDetail.objects.get(id=id)
         content.delete()
         return redirect(contents)

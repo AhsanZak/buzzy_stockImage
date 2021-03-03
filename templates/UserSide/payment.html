@@ -1,0 +1,88 @@
+{% extends 'UserSide/base.html' %}
+{% block title %} Payment{% endblock %}
+{% block content %}
+
+<div class="container">
+
+    <h4 class="p-2">Select your Credit and Download the Image</h4>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">1. Budget</h5>
+                  <p class="card-text">Buy this budget friendly credits and trial option for only 10 dollars. Download upto 5 images.</p>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">2. Money Saver</h5>
+                  <p class="card-text">Buy this Money Saver credits option for only 30 dollars. Download upto 15 images.<p>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">3. Professional</h5>
+                  <p class="card-text">Buy this Professional credits option for only 60 dollars. Download upto 30 images.</p>
+                </div>
+              </div>
+        </div>
+       
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 text-center">
+            <span style="color: red; font-weight: bold;" id="creditmsg" ></span><br>
+            <h6>Select your option : </h6>
+            <input style="width: 100%;" id="credit_option" placeholder="Enter your option number eg: 1, 2, 3" />
+            <button class="btn btn-primary" id="apply-credit" >Buy</button>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+$('#apply-credit').click(function () {
+        let credit_option = $('#credit_option').val()
+        console.log(credit_option)
+        var creditInfo = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+        }
+        if (credit_option == '') {
+            $('#creditmsg').html('Enter Valid option')
+        }
+        else {
+            $.ajax({
+                url: '/apply-credit/',
+                type: 'POST',
+                data: creditInfo,
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.result == 'validcoupen'){
+                        $('#coupenmsg').html('Coupen is valid')
+                        $('#total').html(data.amount)
+                    }
+                    else if(data == 'notvalidcoupen'){
+                        $('#coupenmsg').html('Coupen is not valid')
+                    }
+                    else if(data == 'active'){
+                        $('#coupenmsg').html('Coupon is Already Active')
+                    }
+                }
+            })
+
+        }
+
+    })
+
+</script>
+
+
+{% endblock %}

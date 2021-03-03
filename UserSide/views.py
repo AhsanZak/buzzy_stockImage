@@ -5,23 +5,12 @@ from .models import *
 from AdminPanel.models import *
 from django.http import JsonResponse
 import uuid
-import json
-import mimetypes
-from wsgiref.util import FileWrapper
-from django.core.files.base import ContentFile
-import base64
-from PIL import Image
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
+import cv2
 
-
-def send_file(response):
-    img = open('C:/Users/ahsan/Downloads/pexels-harrison-candlin-2441454.jpg', 'rb')
-    response = FileResponse(img)
-    print("sdfsf")
-    return response
 
 def home(request):
     contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
@@ -43,12 +32,12 @@ def home(request):
 
     if request.is_ajax():
         return render(request,
-                    'UserSide/home.html',
-                    {'section': 'contents', 'contents': contents})
+                      'UserSide/home.html',
+                      {'section': 'contents', 'contents': contents})
     return render(request,
-                    'UserSide/home.html',
-                        {'section': 'images', 'contents': contents})
-                
+                  'UserSide/home.html',
+                  {'section': 'images', 'contents': contents})
+
 
 def load_more(request):
     offset = int(request.GET['offset'])
@@ -57,28 +46,28 @@ def load_more(request):
     if filter == 'all':
         posts = ImageDetail.objects.all()
         totalData = len(posts)
-        posts = posts[offset:limit+offset]
+        posts = posts[offset:limit + offset]
     elif filter == 'free':
         posts = ImageDetail.objects.filter(price=False)
         totalData = len(posts)
-        posts = posts[offset:limit+offset]
+        posts = posts[offset:limit + offset]
     elif filter == 'paid':
         posts = ImageDetail.objects.filter(price=True)
         totalData = len(posts)
-        posts = posts[offset:limit+offset]
+        posts = posts[offset:limit + offset]
     elif filter == 'top':
-        posts = ImageDetail.objects.filter(rate__range=(3,5))
+        posts = ImageDetail.objects.filter(rate__range=(3, 5))
         totalData = len(posts)
-        posts = posts[offset:limit+offset]
+        posts = posts[offset:limit + offset]
 
-    data={}
+    data = {}
     posts_json = serializers.serialize('json', posts)
 
     print("Serialized post", posts_json)
-    
+
     return JsonResponse(data={
-        'posts':posts_json,
-        'totalResult':totalData
+        'posts': posts_json,
+        'totalResult': totalData
     })
 
 
@@ -131,7 +120,8 @@ def register(request):
                 return render(request, 'UserSide/signup.html')
             else:
                 user = UserDetail.objects.create_user(username=username, password=password1, email=email,
-                                                first_name=first_name, last_name=last_name, mobile_number=mobile_number, )
+                                                      first_name=first_name, last_name=last_name,
+                                                      mobile_number=mobile_number, )
                 return redirect('login')
         else:
             messages.info(request, "Passwords Not Matching")
@@ -152,15 +142,13 @@ def logout(request):
 def view_single(request, image_id):
     content = ImageDetail.objects.filter(id=image_id).first()
     contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
-    return render(request, 'UserSide/view_single.html', {'content': content, 'contents': contents })
+    return render(request, 'UserSide/view_single.html', {'content': content, 'contents': contents})
 
 
 def view_creator(request, user):
     user = UserDetail.objects.get(username=user)
     contents = ImageDetail.objects.filter(user=user)
-
     return render(request, 'UserSide/view_creator.html', {'user': user, 'contents': contents})
-
 
 
 def rate(request, image_id):
@@ -202,7 +190,7 @@ def Deactivate_creator(request, user_id):
 
 
 def creator(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff == True:
         no_pending = ImageDetail.objects.filter(user=request.user, approval="pending").count()
         return render(request, 'UserSide/creator.html', {'no_pending': no_pending})
     else:
@@ -210,7 +198,7 @@ def creator(request):
 
 
 def creator_contents(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff == True:
         contents = ImageDetail.objects.filter(user=request.user)
         return render(request, 'UserSide/creator_contents.html', {'contents': contents})
     else:
@@ -218,8 +206,8 @@ def creator_contents(request):
 
 
 def delete_content(request, id):
-    if request.user.is_authenticated:
-        content = ImageDetail.objects.filter(id=id)
+    if request.user.is_authenticated and request.user.is_staff == True:
+        content = ImageDetail.objects.get(id=id)
         content.delete()
         return redirect(creator_contents)
     else:
@@ -227,28 +215,52 @@ def delete_content(request, id):
 
 
 def creator_upload(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff == True:
         if request.method == 'POST':
             name = request.POST['wallpaper_name']
             category = request.POST['category']
             image = request.FILES['image']
             description = request.POST['description']
-            price = request.POST['price'] 
+            price = request.POST['price']
 
             if price == 'free':
                 price = False
-            else: 
+            else:
                 price = True
 
             try:
                 Category.objects.get(name=category)
             except ObjectDoesNotExist:
                 Category.objects.create(name=category)
-            
-            print(price)
-            ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price, image=image, user=request.user,
-                                    approval="pending", description=description)
-            return redirect(creator_upload)
+
+            if price == True :
+                image_detail = ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price,
+                                           image=image, user=request.user,
+                                           approval="pending", description=description)
+
+                logo = cv2.imread("C:/Users/ahsan/OneDrive/Desktop/New folder/python watermark/buzzy_copyright.png")
+
+                h_logo, w_logo, _ = logo.shape
+                img = cv2.imread('static/'+image_detail.ImageURL)
+                h_img, w_img, _ = img.shape
+
+                # Get the center of the original. It's the location where we will place the watermark
+                center_y = int(h_img / 2)
+                center_x = int(w_img / 2)
+
+                top_y = center_y - int(h_logo / 2)
+                left_x = center_x - int(w_logo / 2)
+                bottom_y = top_y + h_logo
+                right_x = left_x + w_logo
+
+                roi = img[top_y: bottom_y, left_x: right_x]
+                result = cv2.addWeighted(roi, 1, logo, 0.3, 0)
+                img[top_y: bottom_y, left_x: right_x] = result
+
+                cv2.imwrite("static/image/watermarks/"+image_detail.image.name, img)
+                return redirect(creator_upload)
+            else:
+                return redirect(creator_upload)
         else:
             categories = Category.objects.all()
             return render(request, 'UserSide/creator_upload.html', {'categories': categories})
@@ -272,15 +284,15 @@ def profile_settings(request):
 def edit_userProfile(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            username = request.user
+            user = request.user
             user_image = request.FILES.get('imageInput')
 
             if user_image is not None:
-                user_profile = UserDetail.objects.filter(username=username)
+                user_profile = UserDetail.objects.filter(username=user)
                 if not user_profile:
                     UserDetail.objects.create(user_image=user_image, user=user)
                 else:
-                    user_profile = UserDetail.objects.get(username=username)
+                    user_profile = UserDetail.objects.get(username=user)
                     user_profile.user_image = user_image
                     user_profile.save()
 
@@ -300,7 +312,7 @@ def download_image(request):
             print("already downloaded")
         else:
             Downloads.objects.create(image=image, transaction_id=uuid.uuid4(), status='success', payment_mode='free',
-                             user=request.user)
+                                     user=request.user)
             result = "success"
             print("success")
         return JsonResponse({'result': result}, safe=False)

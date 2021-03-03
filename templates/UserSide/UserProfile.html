@@ -65,19 +65,46 @@
           </div><!---Col sm -12-->
       </div><!--row-->
 
-      {% if request.user.is_staff == True %}
       <div class="row">
-        <div class="col-md-12">
-            <h3 style="font-size: 3vh;">Creator Account is Activated. Show my <a href="{% url 'creator' %}" style="color: #FF5722; text-decoration: none;">Dashboard</a></h3>
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Credits Available</h5>
+                  <p class="card-text">35</p>
+                  <a href="#" class="btn btn-primary">Buy More</a>
+                </div>
+              </div>
         </div>
-      </div>
-      {% else %}
-      <div class="row">
-        <div class="col-md-12">
-            <h4>Want to be a creator? <a href="{% url 'activate_creator' %}">Click to activate</a> your creator account !!</h4>
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Creator Account</h5>
+                    {% if request.user.is_staff == True %}
+                    <p class="card-text">
+                          Creator Account is Activated. 
+                    <p>
+                    <a href="{% url 'creator' %}" class="btn btn-primary">Dashboard</a>
+                    {% else %}
+                    Want to be a creator? your creator account !!
+                    <p>
+                    <a href="{% url 'activate_creator' %}"class="btn btn-primary">Activate</a>
+                    {% endif %}
+                </div>
+              </div>
         </div>
-      </div>
-      {% endif %}
+        <div class="col-md-4">
+            <div class="card text-center" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Professional</h5>
+                  <p class="card-text">Buy this Professional credits option for only 60 dollars. Download upto 30 images.</p>
+                  <a href="#" class="btn btn-primary">Buy Now</a>
+                </div>
+              </div>
+        </div>
+       
+    </div>
+
+      
   </div><!---/container-->
   
   <!----Image Preview While selection --->

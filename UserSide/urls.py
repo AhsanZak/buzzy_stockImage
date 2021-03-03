@@ -30,7 +30,7 @@ urlpatterns = [
     path('rate/<int:image_id>', views.rate, name="rate"),
     path('download-image/', views.download_image, name="download_image"),
 
-    path('lalala/', views.send_file, name="sdkjf"),
+    # path('apply-credit/', views.apply_credit, name="apply_credit"),
 
     path('downloads', views.downloads, name="downloads"),
     path('payment-page', views.payment_page, name="payment_page")
