@@ -30,8 +30,11 @@ urlpatterns = [
     path('rate/<int:image_id>', views.rate, name="rate"),
     path('download-image/', views.download_image, name="download_image"),
 
-    # path('apply-credit/', views.apply_credit, name="apply_credit"),
-
     path('downloads', views.downloads, name="downloads"),
-    path('payment-page', views.payment_page, name="payment_page")
+    path('payment-page', views.payment_page, name="payment_page"),
+
+    path('apply-credit/', views.apply_credit, name="apply_credit"),
+    path('user-payment/', views.user_payment, name="user_payment"),
+    path('success-razorpay/', views.success_razorpay, name="success_razorpay"),
+    path('success-paypal/', views.success_paypal, name="success_paypal"),
 ]

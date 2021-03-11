@@ -10,6 +10,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
 import cv2
+import datetime
+
 
 
 def home(request):
@@ -81,20 +83,22 @@ def contact(request):
 
 def login(request):
     if request.user.is_authenticated:
+        print("USer Is Authenticated")
         return redirect(home)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-
+        print("Request Method is POST")
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
             auth.login(request, user)
             return redirect(home)
         else:
-            messages.info(request, "Invalid credentials")
-            return redirect(login)
+            messages.info(request, "Invalid Credentials")
+            return render(request, 'UserSide/login.html')
     else:
+        print("User is not authentcautered")
         return render(request, 'UserSide/login.html')
 
 
@@ -122,6 +126,7 @@ def register(request):
                 user = UserDetail.objects.create_user(username=username, password=password1, email=email,
                                                       first_name=first_name, last_name=last_name,
                                                       mobile_number=mobile_number, )
+                Wallet.objects.create(user=user)
                 return redirect('login')
         else:
             messages.info(request, "Passwords Not Matching")
@@ -276,6 +281,8 @@ def profile_settings(request):
     if request.user.is_authenticated:
         username = request.user
         profile = UserDetail.objects.filter(username=username)
+        credits_available = Wallet.objects.all()
+        print(credits_available)
         return render(request, 'UserSide/UserProfile.html', {'profile': profile})
     else:
         return redirect(login)
@@ -322,9 +329,10 @@ def download_image(request):
 
 def payment_page(request):
     if request.user.is_authenticated:
+        print("lalala")
         return render(request, 'UserSide/payment.html')
     else:
-        redirect(login)
+        return redirect(login)
 
 
 def downloads(request):
@@ -333,3 +341,66 @@ def downloads(request):
         return render(request, 'UserSide/image_library.html', {'contents': contents})
     else:
         return redirect(login)
+
+
+def apply_credit(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            option = request.POST['option']
+
+            if option == 1:
+                pass
+
+
+def user_payment(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            mode = request.POST['mode']
+            transaction_id = uuid.uuid4()
+            if mode == 'Paypal':
+                return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+            elif mode == 'Razorpay':
+                return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+    else:
+        return redirect(login)
+
+
+def success_razorpay(request):
+    if request.user.is_authenticated:
+        date = datetime.datetime.now()
+        user = request.user
+        mode = 'Razorpay'
+        tid = request.POST['tid']
+        print("debofer succsess")
+        Order.objects.create(user=user, transaction_id=tid, 
+        date_ordered=date, payment_mode=mode, plan='Plan1', total_price=10)
+
+        credits_available = Wallet.objects.filter(user=user)
+        print("Query Set", credits_available)
+        print("Balance", credits_available.balance)
+        credits_available.balance = int(credits_available.balance) + 10
+        credits_available.save()
+        print("Success")
+        return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
+
+
+def success_paypal(request):
+    if request.user.is_authenticated:
+        date = datetime.datetime.now()
+        user = request.user
+        mode = 'Paypal'
+        id = request.POST['id']
+        tid = request.POST['tid']
+        plan = request.POST['plan']
+        total_amount = 50
+        Order.objects.create(user=user, plan=plan,
+                            total_price=total_amount, transaction_id=tid, date_ordered=date, payment_mode=mode)
+        
+        print("Order Successfull")
+        return JsonResponse('success', safe=False)
+    else:
+        return redirect(login)
+

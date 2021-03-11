@@ -2,49 +2,358 @@
 {% block title %} Payment{% endblock %}
 {% block content %}
 
-<div class="container">
 
-    <h4 class="p-2">Select your Credit and Download the Image</h4>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card text-center" style="width: 18rem;">
-                <div class="card-body">
-                  <h5 class="card-title">1. Budget</h5>
-                  <p class="card-text">Buy this budget friendly credits and trial option for only 10 dollars. Download upto 5 images.</p>
+<style>
+    body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; font-family: 'Noto Sans', sans-serif; letter-spacing: 0px; font-size: 14px; color: #2e3139; font-weight: 400; line-height: 26px; }
+h1, h2, h3, h4, h5, h6 { letter-spacing: 0px; font-weight: 400; color: #1c1e22; margin: 0px 0px 15px 0px; font-family: 'Noto Sans', sans-serif; }
+h1 { font-size: 42px; line-height: 50px; }
+h2 { font-size: 36px; line-height: 42px; }
+h3 { font-size: 20px; line-height: 32px; }
+h4 { font-size: 18px; line-height: 32px; }
+h5 { font-size: 14px; line-height: 20px; }
+h6 { font-size: 12px; line-height: 18px; }
+p { margin: 0 0 20px; line-height: 1.8; }
+p:last-child { margin: 0px; }
+ul, ol { }
+a { text-decoration: none; color: #2e3139; -webkit-transition: all 0.3s; -moz-transition: all 0.3s; transition: all 0.3s; }
+a:focus, a:hover { text-decoration: none; color: #0943c6; }
+.content{padding-top:80px; padding-bottom:80px};
+
+
+/*------------------------
+Radio & Checkbox CSS
+-------------------------*/
+.form-control { border-radius: 4px; font-size: 14px; font-weight: 500; width: 100%; height: 70px; padding: 14px 18px; line-height: 1.42857143; border: 1px solid #dfe2e7; background-color: #dfe2e7; text-transform: capitalize; letter-spacing: 0px; margin-bottom: 16px; -webkit-box-shadow: inset 0 0px 0px rgba(0, 0, 0, .075); box-shadow: inset 0 0px 0px rgba(0, 0, 0, .075); -webkit-appearance: none; }
+
+input[type=radio].with-font, input[type=checkbox].with-font { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+input[type=radio].with-font~label:before, input[type=checkbox].with-font~label:before { font-family: FontAwesome; display: inline-block; content: "\f1db"; letter-spacing: 10px; font-size: 1.2em; color: #dfe2e7; width: 1.4em; }
+input[type=radio].with-font:checked~label:before, input[type=checkbox].with-font:checked~label:before { content: "\f00c"; font-size: 1.2em; color: #0943c6; letter-spacing: 5px; }
+input[type=checkbox].with-font~label:before { content: "\f096"; }
+input[type=checkbox].with-font:checked~label:before { content: "\f046"; color: #0943c6; }
+input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:focus~label:before, input[type=radio].with-font:focus~label, input[type=checkbox].with-font:focus~label { }
+
+.box { background-color: #fff; border-radius: 8px; border: 2px solid #e9ebef; padding: 50px; margin-bottom: 40px; }
+.plan-selection { border-bottom: 2px solid #e9ebef; padding-bottom: 25px; margin-bottom: 35px; }
+.plan-selection:last-child { border-bottom: 0px; margin-bottom: 0px; padding-bottom: 0px; }
+.plan-data { position: relative; }
+.plan-data label { font-size: 20px; margin-bottom: 15px; font-weight: 400; }
+.plan-text { padding-left: 35px; }
+.plan-price { position: absolute; right: 0px; color: #094bde; font-size: 20px; font-weight: 700; letter-spacing: -1px; line-height: 1.5; bottom: 43px; }
+.term-price { bottom: 18px; }
+.secure-price { bottom: 68px; }
+.summary-block { border-bottom: 2px solid #d7d9de; }
+.summary-block:last-child { border-bottom: 0px; }
+.summary-content { padding: 28px 0px; }
+.summary-price { color: #094bde; font-size: 20px; font-weight: 400; letter-spacing: -1px; margin-bottom: 0px; display: inline-block; float: right; }
+.summary-small-text { font-weight: 700; font-size: 12px; color: #8f929a; }
+.summary-text { margin-bottom: -10px; }
+.summary-title { font-weight: 700; font-size: 14px; color: #1c1e22; }
+.summary-head { display: inline-block; width: 120px; }
+
+.widget { margin-bottom: 30px; background-color: #e9ebef; padding: 50px; border-radius: 6px; }
+.widget:last-child { border-bottom: 0px; }
+.widget-title { color: #094bde; font-size: 16px; font-weight: 700; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 1px; display: table; line-height: 1; }
+
+.btn { font-family: 'Noto Sans', sans-serif; font-size: 16px; text-transform: capitalize; font-weight: 700; padding: 12px 36px; border-radius: 4px; line-height: 2; letter-spacing: 0px; -webkit-transition: all 0.3s; -moz-transition: all 0.3s; transition: all 0.3s; word-wrap: break-word; white-space: normal !important; }
+.btn-default { background-color: #0943c6; color: #fff; border: 1px solid #0943c6; }
+.btn-default:hover { background-color: #063bb3; color: #fff; border: 1px solid #063bb3; }
+.btn-default.focus, .btn-default:focus { background-color: #063bb3; color: #fff; border: 1px solid #063bb3; }
+</style>
+
+
+<div class="content">
+    <div class="container">
+         <div class="row">
+                    <div class="col-lg-8 col-md-8 col-sm-7 col-xs-12">
+                        <div class="box">
+                            <h3 class="box-title widget-title">Select Your Download Plan</h3>
+                            <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question4" name="question" type="radio" class="with-font" value="Single Image" />
+                                    <label for="question4">Single Image</label>
+                                    <p class="plan-text">
+                                        1 Image | Time Limit : Unlimited</p>
+                                        <span class="plan-price">$ 2</span>
+                                </div>
+                            </div>
+                            <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question1" name="question" type="radio" class="with-font" value="Personal" />
+                                    <label for="question1">Personal</label>
+                                    <p class="plan-text">
+                                        5 Images | Time Limit : Unlimited</p>
+                                    <span class="plan-price">$ 10</span>
+
+                                </div>
+                            </div>
+                            <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question2" name="question" type="radio" class="with-font" value="Professional" />
+                                    <label for="question2">Profesional</label>
+                                    <p class="plan-text">
+                                        15 Images | Time Limit : Unlimited</p>
+                                    <span class="plan-price">$ 30</span>
+                                </div>
+                            </div>
+                            <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question3" name="question" type="radio" class="with-font" value="Business" />
+                                    <label for="question3">Business</label>
+                                    <p class="plan-text"> 30 Images | Time Limit : Unlimited</p>
+                                    <span class="plan-price">$ 60</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                      
+                        <div class="widget">
+                            <h4 class="widget-title">Order Summary</h4>
+                            <div class="summary-block">
+                                <div class="summary-content">
+                                    <div class="summary-head"><h5 class="summary-title" id="selected-option"></h5></div>
+                                    <div class="summary-price">
+                                        <p class="summary-text" id="total-amount">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12" style="align-items: center;">
+                                    <input id="confirm" type="button" value="Confirm" style="width: 100%;" class="btn btn-primary">
+                                </div>
+                            </div>
+                            
+                        </div>
+
+
+                        <div class="widget" id="payment-container" style="display:none">
+                            <h4 class="widget-title">Pay Using : </h4>
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input type="radio" id="paypal" name="mode" value="Paypal" required>
+                                        <label for="Paypal" style="color: orange;">Paypal</label><br>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <input type="radio" id="razorpay" name="mode" value="Razorpay" required>
+                                        <label for="razorpay" style="color: orangered;">RazorPay</label><br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" style="align-items: center;">
+                                        <input id="order" type="button" value="Place Order" style="width: 100%;" class="btn btn-primary">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12" id="paypal-button-container"></div>
+                                </div>
+                                <input type="hidden" custom='Hidden Element' name="hidden">
+                            </div>
+                        </div>
+
+                       
+                    </div>
                 </div>
-              </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center" style="width: 18rem;">
-                <div class="card-body">
-                  <h5 class="card-title">2. Money Saver</h5>
-                  <p class="card-text">Buy this Money Saver credits option for only 30 dollars. Download upto 15 images.<p>
-                </div>
-              </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center" style="width: 18rem;">
-                <div class="card-body">
-                  <h5 class="card-title">3. Professional</h5>
-                  <p class="card-text">Buy this Professional credits option for only 60 dollars. Download upto 30 images.</p>
-                </div>
-              </div>
-        </div>
-       
+        
+        
+    </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6 text-center">
-            <span style="color: red; font-weight: bold;" id="creditmsg" ></span><br>
-            <h6>Select your option : </h6>
-            <input style="width: 100%;" id="credit_option" placeholder="Enter your option number eg: 1, 2, 3" />
-            <button class="btn btn-primary" id="apply-credit" >Buy</button>
-        </div>
-        <div class="col-md-6">
 
-        </div>
-    </div>
-</div>
+<!-- Include the PayPal JavaScript SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script
+    src="https://www.paypal.com/sdk/js?client-id=AZ-zxKIWEzxYNP6RHnvei07eMWgRneZlEtCTRKXVnMBYSkZISPFsw0Y8WwftjBOb6n0BLn1x9mvFYN4X&currency=USD"
+    data-namespace="paypal_sdk"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"
+    integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+
+<script>
+    var amount = 0  
+    function paypal(tid) {
+        paypal_sdk.Buttons({
+
+            // Set up the transaction
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '{{total_price}}'
+                        }
+                    }]
+                });
+            },
+
+            // Finalize the transaction
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (details) {
+                    // Show a success message to the buyer
+                    console.log(details);
+
+                    alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                    console.log(tid);
+                    successpaypal(tid)
+                });
+            }
+        }).render('#paypal-button-container');
+    }
+
+    function successpaypal(tid) {
+        console.log(tid);
+        var userData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            tid: tid,
+        }
+        $.ajax({
+            url: '/success-paypal/',
+            type: "POST",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                if (data == 'success') {
+                    window.location.replace("/")
+                }
+            }
+        });
+    }
+
+
+    $('#order').click(function () {
+        var userData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            mode: $("input[name='mode']:checked").val()
+        }
+
+        $.ajax({
+            url: '/user-payment/',
+            type: "POST",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                if (data.mode == 'Paypal') {
+                    console.log(data)
+                    $('#order').hide()
+                    $('#paypal-button-container').show()
+                    paypal(data.tid)
+                }
+                else if (data.mode == 'Razorpay') {
+                    console.log(data.mode)
+                    tid = data.tid
+                    $('#order').hide()
+                    razorpay(tid)
+                    amount = data.amount
+                }
+            }
+        });
+    });
+
+    function razorpay(tid) {
+        console.log(tid)
+        var total = 1 * 7000
+        var payment_status = 'razorpay'
+        var options = {
+            "key": "rzp_test_U3zNUwvRlxDktr", // Enter the Key ID generated from the Dashboard
+            "amount": total, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "VICGO",
+            "description": "Test Transaction",
+            //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                success_razorpay(tid)
+            },
+            "prefill": {
+                "name": "{{user.first_name}}" + "{{user.last_name}}",
+                "email": "{{user.email}}",
+                "contact": "9999999999"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#F37254"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+    function success_razorpay(tid) {
+        var userData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            tid: tid,
+            id: $('#address_id').val()
+        }
+        $.ajax({
+            url: '/success-razorpay/',
+            type: "POST",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                if (data == 'success') {
+                    alert('Payment Success.. Order Placed!')
+                    window.location.replace("/")
+                }
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        $("input").change(function(){
+            option = $("input[name='question']:checked")
+            console.log("This is option " + option.parent().children().eq(3).text())
+            $('#selected-option').text(option.val())
+
+            price = $(this).parent().children().eq(3).text();
+            $('#total-amount').text(price)
+
+            console.log(price)
+
+        });
+    });
+
+
+
+    $('#confirm').click(function () {
+        var userData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            option : $("input[name='question']:checked").val()
+        }
+
+        console.log("This is userData Option" + userData.option)
+
+        if (userData.option != null){
+            $("#payment-container").css("display", "block");
+        }
+
+        $.ajax({
+            url: '',
+            type: "POST",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                if (data.mode == 'Paypal') {
+                    console.log(data)
+                    $('#order').hide()
+                    $('#payment-container').show()
+                    paypal(data.tid)
+                }
+                else if (data.mode == 'Razorpay') {
+                    console.log(data.mode)
+                    tid = data.tid
+                    $('#order').hide()
+                    razorpay(tid)
+                    amount = data.amount
+                }
+            }
+        });
+    });
+
+
+</script>
+
+
+
 
 
 <script>
@@ -54,6 +363,7 @@ $('#apply-credit').click(function () {
         console.log(credit_option)
         var creditInfo = {
             csrfmiddlewaretoken: '{{csrf_token}}',
+            option: credit_option
         }
         if (credit_option == '') {
             $('#creditmsg').html('Enter Valid option')
