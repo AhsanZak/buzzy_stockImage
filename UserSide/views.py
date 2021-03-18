@@ -124,9 +124,7 @@ def register(request):
                 return render(request, 'UserSide/signup.html')
             else:
                 user = UserDetail.objects.create_user(username=username, password=password1, email=email,
-                                                      first_name=first_name, last_name=last_name,
-                                                      mobile_number=mobile_number, )
-                Wallet.objects.create(user=user)
+                                                      first_name=first_name, last_name=last_name, mobile_number=mobile_number)
                 return redirect('login')
         else:
             messages.info(request, "Passwords Not Matching")
@@ -145,9 +143,33 @@ def logout(request):
 
 
 def view_single(request, image_id):
-    content = ImageDetail.objects.filter(id=image_id).first()
-    contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
-    return render(request, 'UserSide/view_single.html', {'content': content, 'contents': contents})
+    content = ImageDetail.objects.get(id=image_id)
+    contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True, user=content.user)
+    similar = ImageDetail.objects.filter(approval="approved", user__is_staff=True, category=content.category)
+    comments = Comments.objects.filter(image=image_id).order_by('-id')
+    credits = Wallet.objects.get(user=request.user)
+    
+    if Downloads.objects.filter(user=request.user, image_id=image_id).exists():
+        downloads = Downloads.objects.get(user=request.user, image_id=image_id)
+        if downloads.image_id == image_id:
+            option_available = 1
+        else:
+            option_available = 0
+            print("not paid")
+    else:
+        option_available = 0
+        print("user not regstered")
+
+
+    context = {
+        'content' : content,
+        'contents' : contents,
+        'comments' : comments,
+        'similar' : similar,
+        'credits' : credits,
+        'option_available' : option_available
+    }
+    return render(request, 'UserSide/view_single.html', context)
 
 
 def view_creator(request, user):
@@ -227,18 +249,22 @@ def creator_upload(request):
             image = request.FILES['image']
             description = request.POST['description']
             price = request.POST['price']
-
+            print(price)
             if price == 'free':
+                print("price is false")
                 price = False
             else:
+                print("price is true")
                 price = True
-
             try:
                 Category.objects.get(name=category)
             except ObjectDoesNotExist:
                 Category.objects.create(name=category)
 
+            print("aksdjfladjkfalfjkalsdkjlalsdjfaldkjfaldkjfalkfjadlkfalkfjadlkfajdlkfjaldkjfalsdkjladkjlskd")
+
             if price == True :
+                print("Price is True")
                 image_detail = ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price,
                                            image=image, user=request.user,
                                            approval="pending", description=description)
@@ -263,9 +289,18 @@ def creator_upload(request):
                 img[top_y: bottom_y, left_x: right_x] = result
 
                 cv2.imwrite("static/image/watermarks/"+image_detail.image.name, img)
-                return redirect(creator_upload)
+                result = "created"
+                print(result)
+                return JsonResponse({'data': result}, safe=False)
             else:
-                return redirect(creator_upload)
+                print("price is false")
+                image_detail = ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price,
+                                           image=image, user=request.user,
+                                           approval="pending", description=description)
+                result = "created"
+                print(result)
+                return JsonResponse({'data': result}, safe=False)
+
         else:
             categories = Category.objects.all()
             return render(request, 'UserSide/creator_upload.html', {'categories': categories})
@@ -281,9 +316,12 @@ def profile_settings(request):
     if request.user.is_authenticated:
         username = request.user
         profile = UserDetail.objects.filter(username=username)
-        credits_available = Wallet.objects.all()
-        print(credits_available)
-        return render(request, 'UserSide/UserProfile.html', {'profile': profile})
+        credits_available = Wallet.objects.get(user=request.user)
+        context = {
+            'profile' : profile,
+            'credits_available' : credits_available
+        }
+        return render(request, 'UserSide/UserProfile.html', context)
     else:
         return redirect(login)
 
@@ -335,10 +373,26 @@ def payment_page(request):
         return redirect(login)
 
 
-def downloads(request):
+def add_comment(request):
     if request.user.is_authenticated:
-        contents = ImageDetail.objects.all()
-        return render(request, 'UserSide/image_library.html', {'contents': contents})
+        image = ImageDetail.objects.get(id=request.POST['id'])
+        comment = request.POST['comment']
+        user = request.user
+        Comments.objects.create(user=user, comment=comment, image=image)
+        result = "success"
+        return JsonResponse({'result': result}, safe=False)
+    else:
+        result = "failed"
+        return JsonResponse({'result': result}, safe=False)
+
+
+def library(request):
+    if request.user.is_authenticated:
+        downloads = Downloads.objects.filter(user=request.user)
+        print(downloads)
+        for _ in downloads:
+            print(downloads.image)
+        return render(request, 'UserSide/image_library.html', {'downloads': downloads})
     else:
         return redirect(login)
 
@@ -346,10 +400,22 @@ def downloads(request):
 def apply_credit(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            option = request.POST['option']
+            image_id = request.POST['id']
+            wallet = Wallet.objects.get(user=request.user)
+            print(wallet.credits_available)
+            if wallet.credits_available >= 1:
+                image = ImageDetail.objects.get(id=image_id)
+                wallet.credits_available -= 1
+                wallet.save()
+                Downloads.objects.create(user=request.user, image=image)
+                print("success")
+                return JsonResponse("success", safe=False)
+            else:
+                print("failed")
+                return JsonResponse("failed", safe=False)
+    else:
+        return redirect(login)  
 
-            if option == 1:
-                pass
 
 
 def user_payment(request):
@@ -372,15 +438,30 @@ def success_razorpay(request):
         user = request.user
         mode = 'Razorpay'
         tid = request.POST['tid']
+        plan = request.POST['plan']
+        print(plan)
         print("debofer succsess")
-        Order.objects.create(user=user, transaction_id=tid, 
-        date_ordered=date, payment_mode=mode, plan='Plan1', total_price=10)
+        if Wallet.objects.get(user=request.user).exists():
+            Wallet.objects.get(user=request.user)
+        else:
+            Wallet.objects.create(user=request.user, plan=plan)
 
-        credits_available = Wallet.objects.filter(user=user)
-        print("Query Set", credits_available)
-        print("Balance", credits_available.balance)
-        credits_available.balance = int(credits_available.balance) + 10
-        credits_available.save()
+        if plan == 'Single':
+            print(type(Wallet))
+            Wallet.credits_available = Wallet.credits_available + 1
+            Wallet.credits_available.save()
+        elif plan == 'Personal':
+            Wallet.credits_available = Wallet.credits_available + 5
+            Wallet.credits_available.save()
+        elif plan == 'Professional':
+            Wallet.credits_available = Wallet.credits_available + 15
+            Wallet.credits_available.save()
+        elif plan == 'Business':
+            Wallet.credits_available = Wallet.credits_available + 30
+            Wallet.credits_available.save()
+            
+        Order.objects.create(user=user, transaction_id=tid, date_ordered=date, payment_mode=mode, total_price=2, plan=plan)
+        
         print("Success")
         return JsonResponse('success', safe=False)
     else:
@@ -394,13 +475,36 @@ def success_paypal(request):
         mode = 'Paypal'
         id = request.POST['id']
         tid = request.POST['tid']
-        plan = request.POST['plan']
-        total_amount = 50
-        Order.objects.create(user=user, plan=plan,
-                            total_price=total_amount, transaction_id=tid, date_ordered=date, payment_mode=mode)
-        
+        total_amount = 5
+        image = ImageDetail.objects.get(id=id)
+        Order.objects.create(user=user, total_price=total_amount, transaction_id=tid, date_ordered=date, payment_mode=mode, image=image)
         print("Order Successfull")
         return JsonResponse('success', safe=False)
     else:
         return redirect(login)
+
+
+def payment(request):  
+    if request.method == "POST":
+        try:
+            Wallet.objects.get(user=request.user)
+        except ObjectDoesNotExist:
+            Wallet.objects.create(user=request.user)
+        plan = request.POST["option"]
+        print(plan)
+        wallet = Wallet.objects.get(user=request.user)
+        print(request,'gerrrrr')
+        user = request.user
+        if plan == "Personal":
+            wallet.credits_available = wallet.credits_available + 5
+        elif plan == "Professional":
+            wallet.credits_available = wallet.credits_available + 15
+        elif plan == "Business":
+            wallet.credits_available = wallet.credits_available + 30
+        elif plan == "Single":
+            wallet.credits_available = wallet.credits_available + 1
+        wallet.save()
+        
+        return JsonResponse('success', safe=False)
+    print("Error")
 

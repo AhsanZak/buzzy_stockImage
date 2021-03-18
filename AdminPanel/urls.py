@@ -29,5 +29,4 @@ urlpatterns = [
     path('category/', views.category, name="category"),
     path('add-category/', views.add_category, name="add_category"),
     path('delete-category/', views.delete_category, name="delete_category"),
-
 ]

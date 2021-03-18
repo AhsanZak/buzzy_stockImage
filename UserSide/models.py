@@ -16,29 +16,29 @@ class UserDetail(AbstractUser):
             url = ''
         return url
 
-
-class Wallet(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True)
-    balance = models.IntegerField(default=0, null=True)
-
-
-
 class Order(models.Model):
-    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
-    plan = models.CharField(max_length=50, null=True)
-    date_ordered = models.DateField(auto_now_add=True)
-    total_price = models.IntegerField(null=True, blank=True)
-    transaction_id = models.CharField(max_length=200, null=True)
-    payment_mode = models.CharField(max_length=50, null=True)
-
-
-
-class Downloads(models.Model):
-    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
     date_ordered = models.DateField(auto_now_add=True)
     total_price = models.IntegerField(null=True, blank=True)
-    status = models.CharField(max_length=50, null=True)
     transaction_id = models.CharField(max_length=200, null=True)
     payment_mode = models.CharField(max_length=50, null=True)
-    payment_status = models.CharField(max_length=50, null=True)
+    plan = models.CharField(max_length=50, null=True)
+
+class Comments(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, blank=True, null=True)
+    comment = models.CharField(max_length=500, null=True)
+    date_added = models.DateField(auto_now_add=True)
+
+class Wallet(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    credits_available = models.IntegerField(null=True, default=0)
+
+class Downloads(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
+    date_downloaded = models.DateField(auto_now_add=True)
+
+
+    

@@ -67,38 +67,33 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     <div class="col-lg-8 col-md-8 col-sm-7 col-xs-12">
                         <div class="box">
                             <h3 class="box-title widget-title">Select Your Download Plan</h3>
-                            <div class="plan-selection">
-                                <div class="plan-data">
-                                    <input id="question4" name="question" type="radio" class="with-font" value="Single Image" />
-                                    <label for="question4">Single Image</label>
-                                    <p class="plan-text">
-                                        1 Image | Time Limit : Unlimited</p>
-                                        <span class="plan-price">$ 2</span>
-                                </div>
-                            </div>
-                            <div class="plan-selection">
-                                <div class="plan-data">
-                                    <input id="question1" name="question" type="radio" class="with-font" value="Personal" />
-                                    <label for="question1">Personal</label>
-                                    <p class="plan-text">
-                                        5 Images | Time Limit : Unlimited</p>
-                                    <span class="plan-price">$ 10</span>
 
+                            <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question1" name="question" type="radio" class="with-font" value="Single" />
+                                    <label for="question1">Single Image</label>
+                                    <p class="plan-text"> 1 Image | Time Limit : Unlimited</p>
+                                    <span class="plan-price">$ 2</span>
                                 </div>
                             </div>
                             <div class="plan-selection">
                                 <div class="plan-data">
-                                    <input id="question2" name="question" type="radio" class="with-font" value="Professional" />
-                                    <label for="question2">Profesional</label>
-                                    <p class="plan-text">
-                                        15 Images | Time Limit : Unlimited</p>
+                                    <input id="question2" name="question" type="radio" class="with-font" value="Personal" />
+                                    <label for="question2">Personal</label>
+                                    <p class="plan-text"> 5 Images | Time Limit : Unlimited</p>
+                                    <span class="plan-price">$ 10</span>
+                                </div>
+                            </div> <div class="plan-selection">
+                                <div class="plan-data">
+                                    <input id="question3" name="question" type="radio" class="with-font" value="Professional" />
+                                    <label for="question3">Professional</label>
+                                    <p class="plan-text"> 15 Images | Time Limit : Unlimited</p>
                                     <span class="plan-price">$ 30</span>
                                 </div>
-                            </div>
-                            <div class="plan-selection">
+                            </div> <div class="plan-selection">
                                 <div class="plan-data">
-                                    <input id="question3" name="question" type="radio" class="with-font" value="Business" />
-                                    <label for="question3">Business</label>
+                                    <input id="question4" name="question" type="radio" class="with-font" value="Business" />
+                                    <label for="question4">Business</label>
                                     <p class="plan-text"> 30 Images | Time Limit : Unlimited</p>
                                     <span class="plan-price">$ 60</span>
                                 </div>
@@ -126,7 +121,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                         </div>
 
 
-                        <div class="widget" id="payment-container" style="display:none">
+                        <!-- <div class="widget" id="payment-container" style="display:none">
                             <h4 class="widget-title">Pay Using : </h4>
                             <div class="">
                                 <div class="row">
@@ -150,9 +145,10 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                                 </div>
                                 <input type="hidden" custom='Hidden Element' name="hidden">
                             </div>
-                        </div>
+                        </div> -->
 
-                       
+
+                        <a class="btn btn-primary"  id="pay" type="button">Pay</a>                     
                     </div>
                 </div>
         
@@ -170,6 +166,30 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
     integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
 
 <script>
+
+
+    $('#pay').click(function () {
+        var userData = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                option: $("input[name='question']:checked").val()
+            }
+        console.log(userData.option)
+        $.ajax({
+            url: '/payment/',
+            type: "POST",
+            data: userData,
+            dataType: "JSON",
+            success: function (data) {
+                console.log(data)
+                if (data == 'success'){
+                    console.log(data)
+                    window.location.replace("/")
+                }
+            }
+        });
+    });
+
+
     var amount = 0  
     function paypal(tid) {
         paypal_sdk.Buttons({
@@ -222,9 +242,10 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
     $('#order').click(function () {
         var userData = {
             csrfmiddlewaretoken: '{{ csrf_token }}',
-            mode: $("input[name='mode']:checked").val()
+            mode: $("input[name='mode']:checked").val(),
+            plan : $("input[name='question']:checked").val()
         }
-
+        console.log(userData.plan)
         $.ajax({
             url: '/user-payment/',
             type: "POST",
@@ -241,15 +262,17 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     console.log(data.mode)
                     tid = data.tid
                     $('#order').hide()
-                    razorpay(tid)
+                    razorpay(tid, userData.plan)
                     amount = data.amount
                 }
             }
         });
     });
 
-    function razorpay(tid) {
+    function razorpay(tid, plan) {
         console.log(tid)
+        console.log(plan)
+
         var total = 1 * 7000
         var payment_status = 'razorpay'
         var options = {
@@ -260,7 +283,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
             "description": "Test Transaction",
             //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
             "handler": function (response) {
-                success_razorpay(tid)
+                success_razorpay(tid, plan)
             },
             "prefill": {
                 "name": "{{user.first_name}}" + "{{user.last_name}}",
@@ -278,11 +301,12 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
         rzp1.open();
     }
 
-    function success_razorpay(tid) {
+    function success_razorpay(tid, plan) {
+        console.log("This is successsss_ razorpay . The plan is " + plan)
         var userData = {
             csrfmiddlewaretoken: '{{ csrf_token }}',
             tid: tid,
-            id: $('#address_id').val()
+            plan: plan
         }
         $.ajax({
             url: '/success-razorpay/',
@@ -301,7 +325,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
     $(document).ready(function(){
         $("input").change(function(){
             option = $("input[name='question']:checked")
-            console.log("This is option " + option.parent().children().eq(3).text())
+            console.log("This is option : " + option.parent().children().eq(3).text())
             $('#selected-option').text(option.val())
 
             price = $(this).parent().children().eq(3).text();
@@ -320,12 +344,11 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
             option : $("input[name='question']:checked").val()
         }
 
-        console.log("This is userData Option" + userData.option)
+        console.log("This is userData Option " + userData.option)
 
         if (userData.option != null){
             $("#payment-container").css("display", "block");
         }
-
         $.ajax({
             url: '',
             type: "POST",
@@ -342,7 +365,8 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     console.log(data.mode)
                     tid = data.tid
                     $('#order').hide()
-                    razorpay(tid)
+                    print("hereereerererererererererer")
+                    razorpay(tid, userData.option)
                     amount = data.amount
                 }
             }
@@ -350,13 +374,6 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
     });
 
 
-</script>
-
-
-
-
-
-<script>
 
 $('#apply-credit').click(function () {
         let credit_option = $('#credit_option').val()

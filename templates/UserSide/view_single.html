@@ -3,13 +3,158 @@
 {% load watermark %}
 {% block content %}
 
+<style>
 
+.avatar {
+  width: 30px;
+  border-radius: 50%;
+}
+.avatar-bordered {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border: white 1px solid;
+}
+.avatar-large {
+  width: 50px;
+}
+
+
+.card {
+  height: 250px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  background-size: cover !important;
+  color: white;
+  position: relative;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.card-user {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.card-category {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 20px;
+}
+.card-description {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+.card-description h2 {
+  font-size: 22px;
+}
+.card-description p {
+  font-size: 15px;
+}
+
+    @media(min-width:568px) {
+        .end {
+            margin-left: auto
+        }
+    }
+
+    @media(max-width:768px) {
+        #post {
+            width: 100%
+        }
+    }
+
+
+    #add-comment {
+        margin: 10px;
+        padding: 6px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        text-align: center;
+        background-color: #ecb21f;
+        border-color: #a88734 #9c7e31 #846a29;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 13px;
+        width: 50%
+    }
+
+
+
+    .comments {
+        margin-top: 5%;
+        margin-left: 20px
+    }
+
+    .darker {
+        border: 1px solid #ecb21f;
+        float: right;
+        border-radius: 5px;
+        padding-left: 40px;
+        padding-right: 30px;
+        padding-top: 10px
+    }
+
+    .comment {
+        border: 1px solid rgba(16, 46, 46, 1);
+        background-color: rgba(16, 46, 46, 0.973);
+        float: left;
+        border-radius: 5px;
+        padding-left: 40px;
+        padding-right: 30px;
+        padding-top: 10px
+    }
+
+    .comment h4,
+    .comment span,
+    .darker h4,
+    .darker span {
+        display: inline
+    }
+
+    .comment p,
+    .comment span,
+    .darker p,
+    .darker span {
+        color: rgb(184, 183, 183)
+    }
+
+
+    label {
+        color: rgb(212, 208, 208)
+    }
+
+    #align-form {
+        margin-top: 20px
+    }
+
+    .form-group p a {
+        color: white
+    }
+
+
+    #darker img {
+        margin-right: 15px;
+        position: static
+    }
+
+    .form-group input,
+    .form-group textarea {
+        border: 1px solid rgba(16, 46, 46, 1);
+        border-radius: 12px
+    }
+
+    .form-comment {
+        border: 1px solid rgba(16, 46, 46, 1);
+        background-color: rgba(16, 46, 46, 0.973);
+        border-radius: 5px;
+        padding: 20px
+    }
+</style>
 
 
 <!-- rating-modal -->
 
 <div class="modal fade" id="ratingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -46,7 +191,7 @@
 
 <!-- large-modal -->
 <div class="modal fade" id="large_imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -56,10 +201,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image" style="height: 100%; width: 100%;">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {% if content.price == False %}
+                <img src='{{content.ImageURL}}' alt="Image" style="height: 100%; width: 100%;">
+                {% else %}
+                <img src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image"
+                    style="height: 100%; width: 100%;">
+                {% endif %}
             </div>
         </div>
     </div>
@@ -74,8 +221,13 @@
             <div class=" cover">
                 <div class="col-xs-6 image-preview" id=imagePreview>
                     <a data-toggle="modal" data-target="#large_imageModal">
-                        <img style="max-height: 30rem;" class="img-responsive" src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image">
-
+                        {% if content.price == False %}
+                        <img style="max-height: 30rem;" class="img-responsive" src='{{content.ImageURL}}'
+                            alt="Original Image">
+                        {% else %}
+                        <img style="max-height: 30rem;" class="img-responsive"
+                            src='/image/watermarks/{{ content.image.name}}' alt="Watermark Image">
+                        {% endif %}
                     </a>
                 </div>
             </div>
@@ -83,73 +235,173 @@
 
         <div class="col-md-6">
             <div class="container">
-            <h5 style="color:#FF5722;">{{content.name}}</h5>
-            <h6>{{content.category.name}}</h6>
-            <hr>
+                
+                <h5 style="color:#FF5722;">{{content.name}}</h5>
+                <h6>{{content.category.name}}</h6>
+                <hr>
 
-            <div class="col-xs-6" style="display: flex">
-            <h6>Rating &nbsp;:&nbsp;</h6>
-
-                <span class="fa fa-star {% if content.rate >= 1 %} checked {% endif %}"></span>
-                <span class="fa fa-star {% if content.rate >= 2 %} checked {% endif %}"></span>
-                <span class="fa fa-star {% if content.rate >= 3 %} checked {% endif %}"></span>
-                <span class="fa fa-star {% if content.rate >= 4 %} checked {% endif %}"></span>
-                <span class="fa fa-star {% if content.rate >= 5 %} checked {% endif %}"></span>
-            </div>
-
-            <p>{{content.description}}Another rainy day here
-                today - off for my Sunday run - at least it won't be hot - LOL.
-                Thanks for
-                stopping by - will be by to see you all when I return.</p>
-
-            <h6>Uploded By : <a href="{% url 'view_creator' content.user %}" style="text-decoration: none;">{{content.user}}</a></h6>
-            <h6>Shot On : {{content.camera}}Canon EOS Digital</h6>
-            <hr>
-
-            <div class="row align-items-end ">
-                <div class="col-xs-4 p-2">
-                    <div data-wow-delay="700ms" data-toggle="modal"
-                    data-target="#ratingModal">
-                        <a href="#" class="btn btn-primary">Rate this
-                            Image</a>
+                {% if option_available == 1 or content.price == False %}
+                 <!-- Example split danger button -->
+                        <img src="" id="output" hidden>
+                 <div class="btn-group col-xs-4 p-2">
+                    <button type="button" class="btn btn-success"><a href="{{content.ImageURL}}" style="text-decoration: none; color: white;" id="download" download>Free Download</a></button>
+                    <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <h6 class="text-center">Choose a size</h6>
+                        <div class="dropdown-divider"></div>
+                            <div class="radio dropdown-item">
+                                <input type="radio" name="dimensions" value="original"> Original <span style="color: gray;" id="original"></span>
+                            </div>
+                            <div class="radio dropdown-item">
+                                <input type="radio" name="dimensions" value="large"> Large <span style="color: gray;" id="large"></span>
+                            </div>
+                            <div class="radio dropdown-item">
+                                <input type="radio" name="dimensions" value="medium"> Medium <span style="color: gray;" id="medium"></span>
+                            </div>
+                            <div class="radio dropdown-item">
+                                <input type="radio" name="dimensions" value="small"> Small <span style="color: gray;" id="small"></span>
+                            </div>
+                        <div class="dropdown-divider"></div>
+                            <div class="radio dropdown-item">
+                                <input type="submit" id="image-dimensions" class="btn btn-success" value="Download">
+                            </div>
                     </div>
-               </div>
-               <div class="col-xs-4 p-2">
-                    <a class="btn btn-primary" href="">Save</a>
                 </div>
-                {% if content.price == False %}
-                <div class="col-xs-4 p-2">
-                    <a href="{{content.ImageURL}}" class="btn btn-success" id="download" download>Download</a>
-                </div>
-                {% else %}
-                <div class="col-xs-4 p-2">
-                    <a href="{% url 'payment_page' %}" class="btn btn-danger" id="download" ><i class="fa fa-dollar"></i> Download</a>
-                </div>
+
+                <hr>
                 {% endif %}
 
-            </div>
+                <div class="col-xs-6" style="display: flex">
+                    <h6>Rating &nbsp;:&nbsp;</h6>
+                    <span class="fa fa-star {% if content.rate >= 1 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if content.rate >= 2 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if content.rate >= 3 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if content.rate >= 4 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if content.rate >= 5 %} checked {% endif %}"></span>
+                </div>
+
+                <p>{{content.description}}Another rainy day here
+                    today - off for my Sunday run - at least it won't be hot - LOL.
+                    Thanks for
+                    stopping by - will be by to see you all when I return.</p>
+
+                <h6>Uploded By : <a href="{% url 'view_creator' content.user %}"
+                        style="text-decoration: none;">{{content.user}}</a></h6>
+                <h6>Shot On : {{content.camera}} Canon EOS Digital</h6>
+                <hr>
+
+                <div class="row align-items-end ">
+                    
+                    <div class="col-xs-4 p-2">
+                        <div data-wow-delay="700ms" data-toggle="modal" data-target="#ratingModal">
+                            <a href="#" class="btn btn-primary">Rate this Image</a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 p-2">
+                        <a class="btn btn-primary" href="">Save</a>
+                    </div>
+                    {% if content.price == False %}
+                    <div class="col-xs-4 p-2">
+                        <img src="" id="output" hidden>
+                    </div>
+
+                    {% else %}
+                    <div class="col-xs-4 p-2">
+                        <a class="btn btn-danger" type="button" data-toggle="modal" data-target="#paymentModal">Pay
+                            download</a>
+                    </div>
+
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </div>
     <!-------Image Details-------->
     <hr>
 
+    <!----payment modal---->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Choose the Option for Download</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Available credits : {{credits.credits_available}}</h6>
+                    <h6 id="error-download" ></h6>
+                    <a href="{% url 'payment_page' %}" class="btn btn-danger">Buy credits</a>
+                    <a href="#" class="btn btn-danger" id="apply-credit">Apply Credit</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---payment modal---->
+
+    <!----------Comments---------->
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5 col-md-6 col-12 pb-4 overflow-auto " style="height: 30em;">
+                    <h4 style="font-weight: bolder;">Comments</h4>
+                    {% for comment in comments %}
+                    <div class="comment text-justify darker mt-4 "> <img src="{{comment.user.ImageURL}}" alt=""
+                            class="rounded-circle" width="40" height="40">
+                        <h4 style="color: royalblue;">{{comment.user}}</h4> <span>- {{comment.date_added}}</span> <br>
+                        <p>
+                            <comment class="comment">{{comment.comment}}</comment>
+                        </p>
+                    </div>
+                    {% empty %}
+                    <h5 style="color: #173434;" class="text-center">Be the first one to comment</h5>
+                    <span style="color: red; font-weight: bold;" id="first-comment"></span><br>
+
+                    {% endfor %}
+                </div>
+                <div class="col-lg-4 col-md-5 col-sm-4 offset-md-1 offset-sm-1 col-12 mt-4">
+                    <form class="form-comment" id="algin-form" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <h4 style="color: seashell; font-weight: bold;">Leave a comment</h4> <label
+                                for="message">Message</label>
+                            <textarea name="comment-message" id="comment-message" msg cols="30" rows="5"
+                                class="form-control" style="background-color: black;"></textarea>
+                        </div>
+                        <div class="form-group text-center"> <button type="submit" id="add-comment" class="btn">Post
+                                Comment</button> </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
     <!--------Other Images with same category---------->
     <div class="row p-2">
         <div class="col-md-12 pl-3">
-        <h4>Similar Images</h4>
+            <h4 style="font-weight: bolder;">Similar Images</h4>
         </div>
-        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
-            {% for image in contents %}
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;">
+            {% for image in similar %}
             <listli class="p-2 free gallery-item post-box">
-                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image"
+                        alt="thumbnail"></a>
             </listli>
+            {% empty %}
+            <h3 style="color: #173434; font-weight: bold;" class="text-center">Be the first one to comment</h3>
             {% endfor %}
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
             <listli></listli>
         </div>
         <div class="col-md-12 p-2 text-center">
-            <a class="btn btn-dark"  href="">See More</a>
+            <a class="btn btn-dark" href="">See More</a>
         </div>
     </div>
     <!--------Other Images with same category---------->
@@ -159,13 +411,16 @@
     <!-------Other IMages------->
     <div class="row p-2">
         <div class="col-md-12 pl-3">
-        <h4 >More from this Artist </h4>
+            <h4 style="font-weight: bolder;">More from this Artist </h4>
         </div>
-        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;">
             {% for image in contents %}
             <listli class="p-2 free gallery-item post-box">
-                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image"
+                        alt="thumbnail"></a>
             </listli>
+            {% empty %}
+            <h3 style="color: #173434; font-weight: bold;" class="text-center">Be the first one to comment</h3>
             {% endfor %}
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
             <listli></listli>
@@ -178,12 +433,134 @@
 
 </div>
 
-
-<!--------Download-history-------->
 <script>
 
-$('#download').click(function () {
-    console.log("Insisde the function")
+    $( document ).ready(function() {
+        console.log( "ready!" );
+
+        var img = document.createElement("img");
+        img.src = "{{content.ImageURL}}";
+        var width = img.width;
+        var height = img.height;
+
+        $('#original').html("(" + width + " X " + parseInt(height) + ")")
+
+        switch(true) {
+            case width >= 1920 :
+                console.log("Large Image quality is available")
+
+                var MAX_WIDTH = 1920;
+                var MAX_HEIGHT = 500;
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                $('#large').html("(" + width + " X " + parseInt(height) + ")")
+
+            case width >= 1280 :
+                console.log("Medium Image quality is available")
+                
+                var MAX_WIDTH = 1280;
+                var MAX_HEIGHT = 500;
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                $('#medium').html("(" + width + " X " + parseInt(height) + ")")  
+
+            case width >= 640 : 
+                console.log("Small Image quality is available")
+                
+                var MAX_WIDTH = 640;
+                var MAX_HEIGHT = 500;
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                $('#small').html("(" + width + " X " + parseInt(height) + ")")
+
+            default:
+                // code block
+            }
+
+
+    });
+
+//Call function for download
+    $('#image-dimensions').click(function (){
+        console.log("Image dimensions clicked ")
+
+        var option = $("input[name='dimensions']:checked").val()
+        console.log(option)
+        var img = document.createElement("img");
+        img.src = "{{content.ImageURL}}";
+
+        if (option == "original"){
+            console.log("option selected original ")
+            var width = img.width;
+            ResizeImage(width)
+        }else if (option == "large"){
+            console.log("Large option Selected")
+            var width = "1920"
+            ResizeImage(width)
+        }else if (option == "medium"){
+            console.log("Medium option selected")
+            var width = "1280"
+            ResizeImage(width)
+        }else if (option == "small"){
+            console.log("small option selected")
+            var width = "640"
+            ResizeImage(width)
+        }
+    })
+
+    $('#apply-credit').click(function () {
+        console.log("Apply Credit Function")
+        let image_id = '{{content.id}}'
+        var data = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+            id: image_id,
+        }
+        $.ajax({
+            url: '/apply-credit/',
+            type: 'POST',
+            data: data,
+            dataType: 'JSON',
+            success: function (data) {
+                if (data == 'success') {
+                    console.log("Sucess")
+                    $('#error-download').html('Image is added to your Library. You can download it from there ...!')
+                } else {
+                    console.log("failed")
+                    $('#error-download').html('Ooops..! Looks like you dont have enough credits.')
+                }
+            }
+        })
+    })
+
+    $('#download').click(function () {
+        console.log("Insisde the function")
         let image_id = '{{content.id}}'
         var data = {
             csrfmiddlewaretoken: '{{csrf_token}}',
@@ -196,21 +573,91 @@ $('#download').click(function () {
             data: data,
             dataType: 'JSON',
             success: function (data) {
-               if (data.result == 'success') {
-                   console.log("success")
-                   alert('Downloaded!')
-                   window.location.replace("/")
-               }else if(data.result == 'Already Downloaded'){
-                console.log("Error")
-               }else{
+                if (data.result == 'success') {
+                    console.log("success")
+                    alert('Downloaded!')
+                    window.location.replace("/")
+                } else if (data.result == 'Already Downloaded') {
+                    console.log("Error")
+                } else {
 
-               }
+                }
             }
         })
     })
 
+    $('#add-comment').click(function () {
+        let image_id = '{{content.id}}'
+        var comment = document.getElementById("comment-message").value;
+        var data = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+            id: image_id,
+            comment: comment
+        }
+        $.ajax({
+            url: '/add-comment/',
+            type: 'POST',
+            data: data,
+            dataType: 'JSON',
+            success: function (data) {
+                if (data.result == 'success') {
+                    console.log("success")
+                } else {
+                    console.log("failed")
+                    $('#first-comment').html('Please login to Comment')
+                }
+            }
+        })
+    })
+
+    // Image Resizing
+    function ResizeImage(width) {
+
+        // Create an image
+        var img = document.createElement("img");
+
+        img.src = "{{content.ImageURL}}";
+
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var MAX_WIDTH = width;
+        var MAX_HEIGHT = 500;
+        var width = img.width;
+        var height = img.height;
+
+        console.log(width)
+        console.log(height)
+
+        if (width > height) {
+            if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+            }
+        } else {
+            if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+            }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        var dataurl = canvas.toDataURL("image/png");
+        document.getElementById('output').src = dataurl;
+
+        var a = document.createElement("a"); //Create <a>
+        a.href = dataurl; //Image Base64 Goes here
+        a.download = "Image.png"; //File name Here
+        a.click();
+
+        console.log("Finished : fhajk ")
+    }
+
+
 </script>
 
-
 {% endblock %}
-

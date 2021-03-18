@@ -138,31 +138,32 @@
               <div class="col-md-6">
                 <div class="card-body text-center">
                   <h6 class="mb-4 text-muted">Add a Wallpaper</h6>
+                  <span id="message" style="color: red; text-align: center;"></span>
+                  <form enctype="multipart/form-data">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="wallpaper_name" id="name" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="category" id="category" placeholder="Category" required>
+                    </div>
+                    <label>Upload Image</label>
+                    <input type="file" placeholder="Upload Image" name="image" id="image" accept="image/*" required>
 
-                  <form action="{% url 'creator_upload' %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
                     <div class="form-group">
-                      <input type="text" class="form-control" name="wallpaper_name" placeholder="Name" required>
-                    </div>
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="category" placeholder="Category" required>
-                    </div>
-                    <input type="file" placeholder="Upload Image" name="image" accept="image/*" required>
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="description" placeholder="Image Description" required>
+                      <input type="text" class="form-control" name="description" id="description" placeholder="Image Description" required>
                     </div>
                     <div class="form-group">
                       <div class="">
                         <h6>By Default your content will be available for free.</h6>
                         <h6> You can change it here. </h6>
-                        <select name="price" id="cars">
+                        <select name="price" id="price">
                           <option value="free">Free</option>
                           <option value="paid">Paid</option>
                         </select>
                       </div>
                     </div>
 
-                    <button class="btn btn-primary shadow-2 mb-4">Add Image</button>
+                    <button type="button" id="upload" class="btn btn-primary shadow-2 mb-4">Add Image</button>
                   </form>
 
                 </div>
@@ -229,6 +230,59 @@
     <!-- Custom scripts for all pages-->
     <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
   
+    <script>
+      
+        $('#upload').click(function () {
+          console.log("askdjflaskjalskdjflsksdj")
+        var formData = new FormData();
+        formData.append("wallpaper_name", document.getElementById("name").value);
+        formData.append("image", document.getElementById("image").files[0]);
+        formData.append("category", document.getElementById("category").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("price", document.getElementById("price").value);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        
+        // restrict other Filetypes
+
+        var ext = image.value.split(".")
+        ext = ext[ext.length - 1].toLowerCase();
+        var arrayExtensions = ["jpg","png","svg","jpeg"];
+        // END RESTRRICT FILE TYPE
+
+        if (name.value == '') {
+            $('#message').html('Enter Name')
+        } else if (image.value == '') {
+            $('#message').html('Upload Image')
+        } else if (arrayExtensions.lastIndexOf(ext) == -1){
+            $('#message').html('Only Image Files are Accepted')
+        } else if (category.value == 'Choose An Category') {
+            $('#message').html('Choose a Category')
+        } else if(description.value == ''){
+            $('#message').html('Enter Description')
+        } else if(price.value == ''){
+            $('#message').html('Select the price')
+        }else {
+            $.ajax({
+                url: '/creator-upload/',
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.data == 'created') {
+                      console.log("success")
+                        window.location.replace('/creator-contents/')
+                    }
+                }
+            })
+
+        }
+    })
+
+    </script>
   
 </body>
 </html>

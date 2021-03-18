@@ -24,6 +24,14 @@
     .gallery .gallery-item:hover {
       transform: scale(1.025);
     }
+    
+.bottomright {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
 
 </style>
 
@@ -48,6 +56,11 @@
             {% for image in contents %}
             <listli class="p-2 {{image.price}} gallery-item post-box">
                 <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+                {% if image.price == False %}
+                <div class="bottomright" style="background-color: greenyellow; color: black;">Free</div>
+                {% else %}
+                <div class="bottomright" style="background-color: red; color: white;">Paid</div>
+                {% endif %}
             </listli>
             {% endfor %}
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
