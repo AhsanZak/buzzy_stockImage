@@ -4,51 +4,57 @@
 {% block content %}
 
 <style>
+    .avatar {
+        width: 30px;
+        border-radius: 50%;
+    }
 
-.avatar {
-  width: 30px;
-  border-radius: 50%;
-}
-.avatar-bordered {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  border: white 1px solid;
-}
-.avatar-large {
-  width: 50px;
-}
+    .avatar-bordered {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border: white 1px solid;
+    }
+
+    .avatar-large {
+        width: 50px;
+    }
 
 
-.card {
-  height: 250px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-  background-size: cover !important;
-  color: white;
-  position: relative;
-  border-radius: 5px;
-  margin-bottom: 20px;
-}
-.card-user {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
-.card-category {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 20px;
-}
-.card-description {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-}
-.card-description h2 {
-  font-size: 22px;
-}
-.card-description p {
-  font-size: 15px;
-}
+    .card {
+        height: 250px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        background-size: cover !important;
+        color: white;
+        position: relative;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .card-user {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+
+    .card-category {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 20px;
+    }
+
+    .card-description {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .card-description h2 {
+        font-size: 22px;
+    }
+
+    .card-description p {
+        font-size: 15px;
+    }
 
     @media(min-width:568px) {
         .end {
@@ -158,7 +164,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Rate this Image</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Rate Image</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -166,7 +172,7 @@
             <form method="POST" action="{% url 'rate' content.id %}" name="rating">
                 <div class="modal-body">
                     {% csrf_token %}
-                    <label for="rate">Select rating out of 5:</label>
+                    <label for="rate" style="color: rgba(16, 46, 46, 0.973);">Select rating out of 5:</label>
                     <select name="rate" id="rate">
                         <option value="1" name="rate">1</option>
                         <option value="2" name="rate">2</option>
@@ -230,43 +236,56 @@
                         {% endif %}
                     </a>
                 </div>
+                <div class="col-md-12 p-2">
+                    <h5>Image Tags : </h5>
+                    {% for tags in tags %}
+                        <a id="similar-images" href="{% url 'tag_filter' tags.tag %}" class="btn btn-success btn-sm p-1 inline ">{{tags.tag}}</a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="container">
-                
+
                 <h5 style="color:#FF5722;">{{content.name}}</h5>
                 <h6>{{content.category.name}}</h6>
                 <hr>
 
                 {% if option_available == 1 or content.price == False %}
-                 <!-- Example split danger button -->
-                        <img src="" id="output" hidden>
-                 <div class="btn-group col-xs-4 p-2">
-                    <button type="button" class="btn btn-success"><a href="{{content.ImageURL}}" style="text-decoration: none; color: white;" id="download" download>Free Download</a></button>
-                    <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Toggle Dropdown</span>
+                <!-- Example split danger button -->
+                <img src="" id="output" hidden>
+                <div class="btn-group col-xs-4 p-2">
+                    <button type="button" class="btn btn-success"><a href="{{content.ImageURL}}"
+                            style="text-decoration: none; color: white;" id="download" download>Free
+                            Download</a></button>
+                    <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu">
                         <h6 class="text-center">Choose a size</h6>
                         <div class="dropdown-divider"></div>
-                            <div class="radio dropdown-item">
-                                <input type="radio" name="dimensions" value="original"> Original <span style="color: gray;" id="original"></span>
-                            </div>
-                            <div class="radio dropdown-item">
-                                <input type="radio" name="dimensions" value="large"> Large <span style="color: gray;" id="large"></span>
-                            </div>
-                            <div class="radio dropdown-item">
-                                <input type="radio" name="dimensions" value="medium"> Medium <span style="color: gray;" id="medium"></span>
-                            </div>
-                            <div class="radio dropdown-item">
-                                <input type="radio" name="dimensions" value="small"> Small <span style="color: gray;" id="small"></span>
-                            </div>
+                        <div class="radio dropdown-item">
+                            <input type="radio" name="dimensions" value="original"><span style="color: gray;"
+                                id="original"></span>
+                        </div>
+                        <div class="radio dropdown-item">
+                            <input type="radio" name="dimensions" value="large"><span style="color: gray;"
+                                id="large"></span>
+                        </div>
+                        <div class="radio dropdown-item">
+                            <input type="radio" name="dimensions" value="medium"><span style="color: gray;"
+                                id="medium"></span>
+                        </div>
+                        <div class="radio dropdown-item">
+                            <input type="radio" name="dimensions" value="small"><span style="color: gray;"
+                                id="small"></span>
+                        </div>
                         <div class="dropdown-divider"></div>
-                            <div class="radio dropdown-item">
-                                <input type="submit" id="image-dimensions" class="btn btn-success" value="Download">
-                            </div>
+                        <div class="radio dropdown-item">
+                            <input type="submit" id="image-dimensions" class="btn btn-success" value="Download">
+                        </div>
                     </div>
                 </div>
 
@@ -293,29 +312,38 @@
                 <hr>
 
                 <div class="row align-items-end ">
-                    
+
                     <div class="col-xs-4 p-2">
                         <div data-wow-delay="700ms" data-toggle="modal" data-target="#ratingModal">
                             <a href="#" class="btn btn-primary">Rate this Image</a>
                         </div>
                     </div>
-                    <div class="col-xs-4 p-2">
-                        <a class="btn btn-primary" href="">Save</a>
-                    </div>
-                    {% if content.price == False %}
-                    <div class="col-xs-4 p-2">
-                        <img src="" id="output" hidden>
-                    </div>
-
+                    {% if favourite == 1 %}
+                        <div class="col-xs-4 p-2">
+                            <a class="btn btn-primary" href="" id="add-favourite">Remove</a>
+                        </div>
                     {% else %}
-                    <div class="col-xs-4 p-2">
-                        <a class="btn btn-danger" type="button" data-toggle="modal" data-target="#paymentModal">Pay
-                            download</a>
-                    </div>
+                        <div class="col-xs-4 p-2">
+                            <a class="btn btn-primary" href="" id="add-favourite">Save</a>
+                        </div>
+                    {% endif %}
 
+                    {% if content.price == False %}
+                        <div class="col-xs-4 p-2">
+                            <img src="" id="output" hidden>
+                        </div>
+                    {% else %}
+                        {% if option_available == 1 %}
+
+                        {% else %}
+                            <div class="col-xs-4 p-2">
+                                <a class="btn btn-danger" type="button" data-toggle="modal" data-target="#paymentModal">Pay
+                                    download</a>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
-
+                <span style="color: red;" id="guest"></span>
             </div>
         </div>
     </div>
@@ -335,7 +363,8 @@
                 </div>
                 <div class="modal-body">
                     <h6>Available credits : {{credits.credits_available}}</h6>
-                    <h6 id="error-download" ></h6>
+                    <h6 id="error-download" style="color: red;"></h6>
+                    <h6 id="success-download" style="color: blue;"></h6>
                     <a href="{% url 'payment_page' %}" class="btn btn-danger">Buy credits</a>
                     <a href="#" class="btn btn-danger" id="apply-credit">Apply Credit</a>
                 </div>
@@ -391,11 +420,11 @@
         <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;">
             {% for image in similar %}
             <listli class="p-2 free gallery-item post-box">
-                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image"
+                <a href="{% url 'view_single' image.image.id %}"><img src="{{image.image.image_thumbnail.url}}" class="wow-image"
                         alt="thumbnail"></a>
             </listli>
             {% empty %}
-            <h3 style="color: #173434; font-weight: bold;" class="text-center">Be the first one to comment</h3>
+            <h5 style="color: #173434; font-weight: bold;" class="text-center">Similar images are not available right now.</h5>
             {% endfor %}
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
             <listli></listli>
@@ -435,18 +464,25 @@
 
 <script>
 
-    $( document ).ready(function() {
-        console.log( "ready!" );
+    $(document).ready(function () {
+        console.log("{{content.ImageURL}}");
 
         var img = document.createElement("img");
         img.src = "{{content.ImageURL}}";
         var width = img.width;
         var height = img.height;
 
-        $('#original').html("(" + width + " X " + parseInt(height) + ")")
+        console.log(width)
+        console.log(height)
 
-        switch(true) {
-            case width >= 1920 :
+        if (width == 0){
+            window.location.reload()
+        }
+
+        $('#original').html(" Original (" + width + " X " + parseInt(height) + ")")
+
+        switch (true) {
+            case width >= 1920:
                 console.log("Large Image quality is available")
 
                 var MAX_WIDTH = 1920;
@@ -462,11 +498,11 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#large').html("(" + width + " X " + parseInt(height) + ")")
+                $('#large').html(" Large (" + parseInt(width) + " X " + parseInt(height) + ")")
 
-            case width >= 1280 :
+            case width >= 1280:
                 console.log("Medium Image quality is available")
-                
+
                 var MAX_WIDTH = 1280;
                 var MAX_HEIGHT = 500;
                 if (width > height) {
@@ -480,11 +516,11 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#medium').html("(" + width + " X " + parseInt(height) + ")")  
+                $('#medium').html(" Medium (" + parseInt(width) + " X " + parseInt(height) + ")")
 
-            case width >= 640 : 
+            case width >= 640:
                 console.log("Small Image quality is available")
-                
+
                 var MAX_WIDTH = 640;
                 var MAX_HEIGHT = 500;
                 if (width > height) {
@@ -498,17 +534,39 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#small').html("(" + width + " X " + parseInt(height) + ")")
+                $('#small').html(" Small (" + parseInt(width) + " X " + parseInt(height) + ")")
 
             default:
-                // code block
-            }
+            // code block
+        }
 
 
     });
 
-//Call function for download
-    $('#image-dimensions').click(function (){
+    $('#similar-images').click(function (){
+        console.log("Tags clicked")
+
+        var tag = document.getElementById("similar-images").textContent;
+        var data = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+            id: image_id,
+        }
+
+        $.ajax({
+            url: '/similar-images/',
+            type: 'GET',
+            data: data,
+            dataType: JSON,
+            success: function (data){
+                console.log("succsess")
+                window.location.replace('/similar-images/')
+            }
+        })
+
+    })
+
+    //Call function for download
+    $('#image-dimensions').click(function () {
         console.log("Image dimensions clicked ")
 
         var option = $("input[name='dimensions']:checked").val()
@@ -516,22 +574,64 @@
         var img = document.createElement("img");
         img.src = "{{content.ImageURL}}";
 
-        if (option == "original"){
+        if (option == "original") {
             console.log("option selected original ")
             var width = img.width;
             ResizeImage(width)
-        }else if (option == "large"){
+        } else if (option == "large") {
             console.log("Large option Selected")
             var width = "1920"
             ResizeImage(width)
-        }else if (option == "medium"){
+        } else if (option == "medium") {
             console.log("Medium option selected")
             var width = "1280"
             ResizeImage(width)
-        }else if (option == "small"){
+        } else if (option == "small") {
             console.log("small option selected")
             var width = "640"
             ResizeImage(width)
+        }
+    })
+
+    $('#add-favourite').click(function (e) {
+        e.preventDefault();
+        var x = document.getElementById("add-favourite").textContent;
+        console.log(x)
+        let image_id = '{{content.id}}'
+        var data = {
+            csrfmiddlewaretoken: '{{csrf_token}}',
+            id: image_id,
+        }
+        if (x == "Save") {
+            $.ajax({
+                url: '/add-favourite/',
+                type: 'POST',
+                data: data,
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data == 'success') {
+                        console.log("Sucess")
+                        $('#add-favourite').html('Remove')
+                    } else {
+                        $('#guest').html('Please Login to add Favourites')
+                    }
+                }
+            })
+        }else {
+            $.ajax({
+                url: '/remove-favourite/',
+                type: 'POST',
+                data: data,
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data == 'success') {
+                        console.log("Sucess")
+                        $('#add-favourite').html('Save')
+                    } else {
+                        console.log("failed")
+                    }
+                }
+            })
         }
     })
 
@@ -550,10 +650,12 @@
             success: function (data) {
                 if (data == 'success') {
                     console.log("Sucess")
-                    $('#error-download').html('Image is added to your Library. You can download it from there ...!')
-                } else {
+                    $('#success-download').html('Image is added to your Library. You can download it from there ...!')
+                } else if(data == 'failed') {
                     console.log("failed")
                     $('#error-download').html('Ooops..! Looks like you dont have enough credits.')
+                } else{
+                    $('#error-download').html('Please Login and Buy Credits')
                 }
             }
         })
@@ -609,7 +711,6 @@
             }
         })
     })
-
     // Image Resizing
     function ResizeImage(width) {
 

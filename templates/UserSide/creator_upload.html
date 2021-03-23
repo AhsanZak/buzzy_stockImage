@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,72 +11,82 @@
 
   <!-- Custom fonts for this template-->
   <link href="{% static 'AdminPanel/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
+  <link
+    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css"
+    integrity="sha512-MMojOrCQrqLg4Iarid2YMYyZ7pzjPeXKRvhW9nZqLo6kPBBTuvNET9DBVWptAo/Q20Fy11EIHM5ig4WlIrJfQw=="
+    crossorigin="anonymous" />
   <!-- Custom styles for this template-->
   <link href="{% static 'AdminPanel/css/sb-admin-2.min.css' %}" rel="stylesheet">
   <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
 
 
 </head>
-<body>
-  
 
- <header>
+<body>
+
+
+  <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: #343a40!important">
-        <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
-        <div class="flex-grow-1 d-flex">
-            <form class="form-inline mx-0 mx-lg-auto rounded">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </div>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
+      <div class="flex-grow-1 d-flex">
+        <form class="form-inline mx-0 mx-lg-auto rounded">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
 
         <ul class="navbar-nav ml-auto">
-          <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
+          <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </list>
           <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
           {% if request.user.is_authenticated %}
-          <list class="nav-item dropdown" >
-              <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <list class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
               Profile
-              </a>
-              <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
+            </a>
+            <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
               {% if request.user.is_staff == True %}
               <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
               {% endif %}
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-              </div>
+            </div>
           </list>
           {% else %}
           <list class="nav-item">
-              <a class="nav-link" href="{% url 'login' %}">Login</a>
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
           </list>
           {% endif %}
           <list class="nav-item">
-              <a class="nav-link" href="{% url 'downloads' %}">Downloads</a>
+            <a class="nav-link" href="{% url 'library' %}">Library</a>
           </list>
-      </ul>
-        </div>
+        </ul>
+      </div>
     </nav>
-</header>
+  </header>
 
-    <!-- Page Wrapper -->
+  <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #343a40 !important; background-image: none;">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar"
+      style="background-color: #343a40 !important; background-image: none;">
 
 
       <!-- Divider -->
       <hr class="sidebar-divider my-0">
 
-    <!-- Nav Item - Dashboard -->
+      <!-- Nav Item - Dashboard -->
       <li class="nav-item active">
         <a class="nav-link" href="{% url 'creator' %}">
           <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -92,7 +103,8 @@
 
       <!-- Nav Item - Pages Collapse Menu -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
+          aria-controls="collapsePages">
           <i class="fas fa-fw fa-folder"></i>
           <span>Manage contents</span>
         </a>
@@ -133,45 +145,48 @@
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
-         <!-- Content Row -->
+          <!-- Content Row -->
           <div class="row">
-              <div class="col-md-6">
-                <div class="card-body text-center">
-                  <h6 class="mb-4 text-muted">Add a Wallpaper</h6>
-                  <span id="message" style="color: red; text-align: center;"></span>
-                  <form enctype="multipart/form-data">
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="wallpaper_name" id="name" placeholder="Name" required>
-                    </div>
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="category" id="category" placeholder="Category" required>
-                    </div>
-                    <label>Upload Image</label>
-                    <input type="file" placeholder="Upload Image" name="image" id="image" accept="image/*" required>
+            <div class="col-md-6">
+              <div class="card-body text-center">
+                <h6 class="mb-4 text-muted">Upload your Image</h6>
+                <span id="message" style="color: red; text-align: center;"></span>
+                <form enctype="multipart/form-data">
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="wallpaper_name" id="name" placeholder="Name" required>
+                  </div>
 
-                    <div class="form-group">
-                      <input type="text" class="form-control" name="description" id="description" placeholder="Image Description" required>
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="tags" id="tags" placeholder="Tags" required>
+                  </div>
+
+                  <label>Upload Image</label>
+                  <input type="file" placeholder="Upload Image" name="image" id="image" accept="image/*" required>
+
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="description" id="description"
+                      placeholder="Image Description" required>
+                  </div>
+                  <div class="form-group">
+                    <div class="">
+                      <h6>By Default your content will be available for free.</h6>
+                      <h6> You can change it here. </h6>
+                      <select name="price" id="price">
+                        <option value="free">Free</option>
+                        <option value="paid">Paid</option>
+                      </select>
                     </div>
-                    <div class="form-group">
-                      <div class="">
-                        <h6>By Default your content will be available for free.</h6>
-                        <h6> You can change it here. </h6>
-                        <select name="price" id="price">
-                          <option value="free">Free</option>
-                          <option value="paid">Paid</option>
-                        </select>
-                      </div>
-                    </div>
+                  </div>
 
-                    <button type="button" id="upload" class="btn btn-primary shadow-2 mb-4">Add Image</button>
-                  </form>
-
-                </div>
-              </div>
-
-              <div class="col-md-6">
+                  <button type="button" id="upload" class="btn btn-primary shadow-2 mb-4">Add Image</button>
+                </form>
 
               </div>
+            </div>
+
+            <div class="col-md-6">
+
+            </div>
           </div>
           <!-- Content Row -->
 
@@ -184,33 +199,36 @@
 
 
 
-  <footer class="footer footer-area" style=" position: relative; top:0; left: 0; bottom: 0; width: 100%; text-align: center;">
-    <div class="container" >
-      <div class="row">
-        <div class="col-12">
-          <div class="footer-content d-flex align-items-center justify-content-between">
+      <footer class="footer footer-area"
+        style=" position: relative; top:0; left: 0; bottom: 0; width: 100%; text-align: center;">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <div class="footer-content d-flex align-items-center justify-content-between">
 
-            <div class="copywrite-text">
-              <p>
-                Copyright &copy;<script data-cfasync="false" src=""></script><script>document.write(new Date().getFullYear());</script> All rights reserved.
-              </p>
-            </div>
+                <div class="copywrite-text">
+                  <p>
+                    Copyright &copy;
+                    <script data-cfasync="false" src=""></script>
+                    <script>document.write(new Date().getFullYear());</script> All rights reserved.
+                  </p>
+                </div>
 
-            <div class="footer-logo">
-              <a href=""><img src="" alt=""></a>
-            </div>
+                <div class="footer-logo">
+                  <a href=""><img src="" alt=""></a>
+                </div>
 
-            <div class="social-info">
-              <a href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a>
-              <a href="#"><i class="fab fa-twitter-alt" aria-hidden="true"></i></a>
-              <a href="#"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-              <a href="#"><i class="fab fa-pinterest" aria-hidden="true"></i></a>
+                <div class="social-info">
+                  <a href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a>
+                  <a href="#"><i class="fab fa-twitter-alt" aria-hidden="true"></i></a>
+                  <a href="#"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+                  <a href="#"><i class="fab fa-pinterest" aria-hidden="true"></i></a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </footer>
+      </footer>
 
 
 
@@ -218,71 +236,71 @@
     <!-- End of Content Wrapper -->
   </div>
   <!-- End of Page Wrapper -->
-  
-    <!-- Bootstrap core JavaScript-->
-    <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'AdminPanel/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  
-  
-    <!-- Core plugin JavaScript-->
-    <script src="{% static 'AdminPanel/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
-  
-    <!-- Custom scripts for all pages-->
-    <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
-  
-    <script>
-      
-        $('#upload').click(function () {
-          console.log("askdjflaskjalskdjflsksdj")
-        var formData = new FormData();
-        formData.append("wallpaper_name", document.getElementById("name").value);
-        formData.append("image", document.getElementById("image").files[0]);
-        formData.append("category", document.getElementById("category").value);
-        formData.append("description", document.getElementById("description").value);
-        formData.append("price", document.getElementById("price").value);
-        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-        
-        
-        // restrict other Filetypes
 
-        var ext = image.value.split(".")
-        ext = ext[ext.length - 1].toLowerCase();
-        var arrayExtensions = ["jpg","png","svg","jpeg"];
-        // END RESTRRICT FILE TYPE
+  <!-- Bootstrap core JavaScript-->
+  <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'AdminPanel/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
-        if (name.value == '') {
-            $('#message').html('Enter Name')
-        } else if (image.value == '') {
-            $('#message').html('Upload Image')
-        } else if (arrayExtensions.lastIndexOf(ext) == -1){
-            $('#message').html('Only Image Files are Accepted')
-        } else if (category.value == 'Choose An Category') {
-            $('#message').html('Choose a Category')
-        } else if(description.value == ''){
-            $('#message').html('Enter Description')
-        } else if(price.value == ''){
-            $('#message').html('Select the price')
-        }else {
-            $.ajax({
-                url: '/creator-upload/',
-                type: 'POST',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: 'JSON',
-                success: function (data) {
-                    if (data.data == 'created') {
-                      console.log("success")
-                        window.location.replace('/creator-contents/')
-                    }
-                }
-            })
 
-        }
+  <!-- Core plugin JavaScript-->
+  <script src="{% static 'AdminPanel/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
+
+  <script>
+
+    $('#upload').click(function () {
+      console.log("askdjflaskjalskdjflsksdj")
+      var formData = new FormData();
+      formData.append("wallpaper_name", document.getElementById("name").value);
+      formData.append("image", document.getElementById("image").files[0]);
+      formData.append("tags", document.getElementById("tags").value);
+      formData.append("description", document.getElementById("description").value);
+      formData.append("price", document.getElementById("price").value);
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+
+      // restrict other Filetypes
+      var ext = image.value.split(".")
+      ext = ext[ext.length - 1].toLowerCase();
+      var arrayExtensions = ["jpg", "png", "svg", "jpeg"];
+      // END RESTRRICT FILE TYPE
+
+      if (name.value == '') {
+        $('#message').html('Enter Name')
+      } else if (image.value == '') {
+        $('#message').html('Upload Image')
+      } else if (arrayExtensions.lastIndexOf(ext) == -1) {
+        $('#message').html('Only Image Files are Accepted')
+      } else if (tags.value == 'Choose An Category') {
+        $('#message').html('Choose a Category')
+      } else if (description.value == '') {
+        $('#message').html('Enter Description')
+      } else if (price.value == '') {
+        $('#message').html('Select the price')
+      } else {
+        $.ajax({
+          url: '/creator-upload/',
+          type: 'POST',
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          dataType: 'JSON',
+          success: function (data) {
+            if (data.data == 'created') {
+              console.log("success")
+              window.location.replace('/creator-contents/')
+            }
+          }
+        })
+
+      }
     })
 
-    </script>
-  
+  </script>
+
 </body>
+
 </html>

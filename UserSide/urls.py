@@ -11,7 +11,8 @@ urlpatterns = [
     path('register', views.register, name="register"),
     path('logout', views.logout, name="logout"),
 
-    # path('serach/', views.search, name="search"),
+    path('search/', views.search, name="search"),
+    path('tag-filter/<str:tag_name>/', views.tag_filter, name="tag_filter"),
     path('view-creator/<str:user>/', views.view_creator, name="view_creator"),
 
     path('activate-creator/', views.activate_creator, name="activate_creator"),
@@ -31,6 +32,9 @@ urlpatterns = [
     path('add-comment/', views.add_comment, name="add_comment"),
 
     path('download-image/', views.download_image, name="download_image"),
+
+    path('add-favourite/', views.add_favourite, name="add_favourite"),
+    path('remove-favourite/', views.remove_favourite, name="remove_favourite"),
 
     path('library', views.library, name="library"),
     path('payment-page', views.payment_page, name="payment_page"),

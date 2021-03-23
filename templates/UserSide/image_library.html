@@ -14,7 +14,7 @@
         <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
             {% for image in downloads %}
             <listli class="p-2 free gallery-item post-box">
-                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+                <a href="{% url 'view_single' image.image.id %}"><img src="{{image.image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
             </listli>
             {% empty %}
             <h6>You dont have any Premium Images right row ..!</h6>
@@ -22,8 +22,24 @@
             <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
             <listli></listli>
         </div>
-        <hr>
-        <h5>Your Favourites : </h5>
+
+    </div>
+    <hr>
+    <div class="row p-2">
+        <div class="col-md-12 pl-3">
+        <h5>Your favourites : </h5>
+        </div>
+        <div class=" col-md-12 unlist p-3 post-wrapper gallery overflow-auto" style="height: 30em;" >
+            {% for image in favourites %}
+            <listli class="p-2 free gallery-item post-box">
+                <a href="{% url 'view_single' image.image.id %}"><img src="{{image.image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+            </listli>
+            {% empty %}
+            <h6>You dont have any Saved Images right row ..!</h6>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
 
     </div>
 </div>

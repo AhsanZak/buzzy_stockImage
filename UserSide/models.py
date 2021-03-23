@@ -16,6 +16,12 @@ class UserDetail(AbstractUser):
             url = ''
         return url
 
+
+class Creator(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    bio = models.CharField(max_length=500, null=True, blank=True, default="Hi there, I am new to Buzzy.")
+    
+
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
@@ -34,6 +40,7 @@ class Comments(models.Model):
 class Wallet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     credits_available = models.IntegerField(null=True, default=0)
+    
 
 class Downloads(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
@@ -41,4 +48,7 @@ class Downloads(models.Model):
     date_downloaded = models.DateField(auto_now_add=True)
 
 
+class Favourites(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
     

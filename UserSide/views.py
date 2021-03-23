@@ -11,11 +11,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
 import cv2
 import datetime
+from django.db.models import Q
 
 
 
 def home(request):
-    contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
+    contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True).order_by('-id')
     paginator = Paginator(contents, 10)
     print(paginator)
     page = request.GET.get('page')
@@ -119,12 +120,13 @@ def register(request):
             elif UserDetail.objects.filter(email=email).exists():
                 messages.info(request, "Email Taken")
                 return render(request, 'UserSide/signup.html')
-            elif UserDetail.objects.filter(last_name=last_name).exists():
+            elif UserDetail.objects.filter(mobile_number=mobile_number).exists():
                 messages.info(request, "Mobile Number Taken")
                 return render(request, 'UserSide/signup.html')
             else:
                 user = UserDetail.objects.create_user(username=username, password=password1, email=email,
                                                       first_name=first_name, last_name=last_name, mobile_number=mobile_number)
+                Wallet.objects.create(user=user)
                 return redirect('login')
         else:
             messages.info(request, "Passwords Not Matching")
@@ -142,40 +144,92 @@ def logout(request):
         return redirect(home)
 
 
+def search(request):
+    if request.method == 'GET':
+        search_name = request.GET['search']
+        print(type(search_name))
+        contents = ImageDetail.objects.filter(Q(tag_image__tag__icontains=search_name) | Q(name__icontains=search_name)).distinct('image')
+        print(contents)
+        context = {
+            'contents': contents,
+            'search_content': search_name
+        }
+        return render(request, 'UserSide/searchContent.html', context)
+
+
+def tag_filter(request, tag_name):
+    print(tag_name)
+    contents = Tags.objects.filter(tag=tag_name).distinct('image')
+    context = {
+        'contents': contents,
+        'tag_name': tag_name
+    }
+    return render(request, 'UserSide/tagContent.html', context)
+
+
 def view_single(request, image_id):
     content = ImageDetail.objects.get(id=image_id)
     contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True, user=content.user)
-    similar = ImageDetail.objects.filter(approval="approved", user__is_staff=True, category=content.category)
     comments = Comments.objects.filter(image=image_id).order_by('-id')
-    credits = Wallet.objects.get(user=request.user)
+    # credits = Wallet.objects.get(user=request.user)
+    tags = Tags.objects.filter(image_id=content)
+
+    #similar_images
+    tag_list = []
+    for tag in tags:
+        tag_list.append(tag.tag)
+    similar_images = Tags.objects.filter(~Q(image_id=image_id), tag__in=tag_list).distinct('image')
+
+    if request.user.is_authenticated:
+        try:
+            Favourites.objects.get(user=request.user, image=content)
+            favourite = 1
+        except ObjectDoesNotExist or Object:
+            favourite = 0
     
-    if Downloads.objects.filter(user=request.user, image_id=image_id).exists():
-        downloads = Downloads.objects.get(user=request.user, image_id=image_id)
-        if downloads.image_id == image_id:
-            option_available = 1
+        if Downloads.objects.filter(user=request.user, image_id=image_id).exists():
+            downloads = Downloads.objects.get(user=request.user, image_id=image_id)
+            if downloads.image_id == image_id:
+                option_available = 1
+                print(option_available)
+            else:
+                option_available = 0
+                print("not paid")
+                print(option_available)
         else:
             option_available = 0
-            print("not paid")
+        print(option_available)
     else:
+        favourite = 0
         option_available = 0
         print("user not regstered")
+        print(option_available)
 
+    print(option_available)
 
     context = {
         'content' : content,
         'contents' : contents,
         'comments' : comments,
-        'similar' : similar,
-        'credits' : credits,
-        'option_available' : option_available
+        'similar' : similar_images,
+        # 'credits' : credits,
+        'tags': tags,
+        'option_available' : option_available, 
+        'favourite' : favourite
     }
     return render(request, 'UserSide/view_single.html', context)
 
 
 def view_creator(request, user):
-    user = UserDetail.objects.get(username=user)
-    contents = ImageDetail.objects.filter(user=user)
-    return render(request, 'UserSide/view_creator.html', {'user': user, 'contents': contents})
+    creator = UserDetail.objects.get(username=user)
+    contents = ImageDetail.objects.filter(user=creator)
+    creator_bio = Creator.objects.get(user=creator)
+    context = {
+        'user': creator, 
+        'contents': contents, 
+        'creator_bio': creator_bio
+    }
+    return render(request, 'UserSide/view_creator.html', context)
 
 
 def rate(request, image_id):
@@ -200,6 +254,7 @@ def activate_creator(request):
         if user.is_staff == False:
             user.is_staff = True
             user.save()
+            Creator.objects.create(user=request.user)
         return redirect(profile_settings)
     else:
         return redirect(login)
@@ -210,8 +265,10 @@ def Deactivate_creator(request, user_id):
         user = UserDetail.objects.get(id=user_id)
         if user.is_staff == True:
             user.is_staff = False
+            creator = Creator.objects.get(user=request.user)
+            creator.delete()
             user.save()
-        return redirect(home)
+        return redirect(profile_settings)
     else:
         return redirect(login)
 
@@ -245,29 +302,32 @@ def creator_upload(request):
     if request.user.is_authenticated and request.user.is_staff == True:
         if request.method == 'POST':
             name = request.POST['wallpaper_name']
-            category = request.POST['category']
+            tags = request.POST['tags']
             image = request.FILES['image']
             description = request.POST['description']
             price = request.POST['price']
             print(price)
+
+
+            tag_list = tags.split()
+            print(tag_list)
+
+
             if price == 'free':
                 print("price is false")
                 price = False
             else:
                 print("price is true")
                 price = True
-            try:
-                Category.objects.get(name=category)
-            except ObjectDoesNotExist:
-                Category.objects.create(name=category)
-
-            print("aksdjfladjkfalfjkalsdkjlalsdjfaldkjfaldkjfalkfjadlkfalkfjadlkfajdlkfjaldkjfalsdkjladkjlskd")
 
             if price == True :
                 print("Price is True")
-                image_detail = ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price,
+                image_detail = ImageDetail.objects.create(name=name, price=price,
                                            image=image, user=request.user,
                                            approval="pending", description=description)
+                
+                for tags in tag_list:
+                    Tags.objects.create(tag=tags, image=image_detail)
 
                 logo = cv2.imread("C:/Users/ahsan/OneDrive/Desktop/New folder/python watermark/buzzy_copyright.png")
 
@@ -294,16 +354,19 @@ def creator_upload(request):
                 return JsonResponse({'data': result}, safe=False)
             else:
                 print("price is false")
-                image_detail = ImageDetail.objects.create(name=name, category=Category.objects.get(name=category), price=price,
+                image_detail = ImageDetail.objects.create(name=name, price=price,
                                            image=image, user=request.user,
                                            approval="pending", description=description)
+                                           
+                for tags in tag_list:
+                    Tags.objects.create(tag=tags, image=image_detail)
+
                 result = "created"
                 print(result)
                 return JsonResponse({'data': result}, safe=False)
 
         else:
-            categories = Category.objects.all()
-            return render(request, 'UserSide/creator_upload.html', {'categories': categories})
+            return render(request, 'UserSide/creator_upload.html')
     else:
         return redirect(login)
 
@@ -317,9 +380,15 @@ def profile_settings(request):
         username = request.user
         profile = UserDetail.objects.filter(username=username)
         credits_available = Wallet.objects.get(user=request.user)
+        try:
+            creator_bio = Creator.objects.get(user=request.user)
+        except ObjectDoesNotExist:
+            creator_bio = 0
+
         context = {
             'profile' : profile,
-            'credits_available' : credits_available
+            'credits_available' : credits_available, 
+            'creator_bio' : creator_bio 
         }
         return render(request, 'UserSide/UserProfile.html', context)
     else:
@@ -331,6 +400,15 @@ def edit_userProfile(request):
         if request.method == 'POST':
             user = request.user
             user_image = request.FILES.get('imageInput')
+            creator_bio = request.POST['bio']
+
+            try:
+                Creator.objects.get(user=user)
+                bio = Creator.objects.get(user=user)
+                bio.bio = creator_bio
+                bio.save()
+            except ObjectDoesNotExist:
+                pass
 
             if user_image is not None:
                 user_profile = UserDetail.objects.filter(username=user)
@@ -389,10 +467,12 @@ def add_comment(request):
 def library(request):
     if request.user.is_authenticated:
         downloads = Downloads.objects.filter(user=request.user)
-        print(downloads)
-        for _ in downloads:
-            print(downloads.image)
-        return render(request, 'UserSide/image_library.html', {'downloads': downloads})
+        favourites = Favourites.objects.filter(user=request.user)
+        context = {
+            'downloads' : downloads,
+            'favourites' : favourites
+        }
+        return render(request, 'UserSide/image_library.html', context)
     else:
         return redirect(login)
 
@@ -407,6 +487,15 @@ def apply_credit(request):
                 image = ImageDetail.objects.get(id=image_id)
                 wallet.credits_available -= 1
                 wallet.save()
+                
+                print("This is the user : ", request.user)
+
+                creator = image.user
+                print("This is creator : ", creator)
+
+                creator_wallet = Wallet.objects.get(user=creator)
+                print("Creator Wallet : ", creator_wallet.credits_available)
+
                 Downloads.objects.create(user=request.user, image=image)
                 print("success")
                 return JsonResponse("success", safe=False)
@@ -414,8 +503,38 @@ def apply_credit(request):
                 print("failed")
                 return JsonResponse("failed", safe=False)
     else:
-        return redirect(login)  
+        return JsonResponse("guest", safe=False)
+        
 
+def add_favourite(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            image_id = request.POST['id']
+            image = ImageDetail.objects.get(id=image_id)
+            Favourites.objects.create(user=user, image=image)
+            print("success added to favourites --------------------------------------------------------------------- ")
+            return JsonResponse("success", safe=False)
+        else:
+            print("failed")
+            return JsonResponse("failed", safe=False)
+    else:
+        return JsonResponse("guest", safe=False)
+
+
+def remove_favourite(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            image_id = request.POST['id']
+            image = ImageDetail.objects.get(id=image_id)
+            favourite = Favourites.objects.get(user=user, image=image)
+            favourite.delete()
+            print("success Remove from favourites --------------------------------------------------------------------- ")
+            return JsonResponse("success", safe=False)
+        else:
+            print("failed")
+            return JsonResponse("failed", safe=False)
 
 
 def user_payment(request):

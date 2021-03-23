@@ -1,0 +1,170 @@
+{% extends 'UserSide/base.html' %}
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<style>
+   
+    .gallery img {
+      border-radius: 8px;
+      box-shadow: 0 0 16px #333;
+      transition: all 1.5s ease;
+    }
+    .gallery img:hover {
+      box-shadow: 0 0 32px #333;
+    }
+    .gallery .content {
+      padding: 4px;
+    }
+    .gallery .gallery-item {
+      transition: grid-row-start 300ms linear;
+      transition: transform 300ms ease;
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+    .gallery .gallery-item:hover {
+      transform: scale(1.025);
+    }
+    
+.bottomright {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+
+</style>
+
+
+<div class="container-fluid" style="padding-bottom: 8em;">
+
+    <div class="row">
+        <div class="col-12 p-2">
+            <div class="alime-projects-menu">
+                <div class="portfolio-menu p-2 pl-5" id="myBtnContainer">
+                    <h5>Search Results for : {{search_content}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="unlist p-5 post-wrapper gallery" >
+            {% for image in contents %}
+            <listli class="p-2 {{image.price}} gallery-item post-box">
+                <a href="{% url 'view_single' image.id %}"><img src="{{image.image_thumbnail.url}}" class="wow-image" alt="thumbnail"></a>
+                {% if image.price == False %}
+                <div class="bottomright" style="background-color: greenyellow; color: black;">Free</div>
+                {% else %}
+                <div class="bottomright" style="background-color: red; color: white;">Paid</div>
+                {% endif %}
+            </listli>
+            {% empty %}
+            <h6>Oops ..! We couldn't find anything. </h6>
+            {% endfor %}
+            <!--  Adding an empty <listli> here so the final photo doesn't stretch like crazy.  -->
+            <listli></listli>
+        </div>
+    </div>
+
+    <!-- <div class="row">
+        <div class="col-12 text-center " data-wow-delay="700ms">
+          <a id="loadmoreBtn" href="" class="btn btn-dark">View More</a>
+        </div>
+    </div> -->
+
+</div>
+
+
+<script>
+    let currentFilter = 'all';
+    $(document).ready(function(){
+      $("#loadmoreBtn").on('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var _currentResult= $(".post-box").length;
+        loadData(_currentResult, currentFilter, true);
+      });
+    });
+
+    $("#all").on('click', function(e){
+        currentFilter = 'all';
+        loadData(0, currentFilter);
+      });
+
+      $("#free").on('click', function(e){
+        currentFilter = 'free';
+        loadData(0, currentFilter);
+      });
+
+      $("#paid").on('click', function(e){
+        currentFilter = 'paid';
+        loadData(0, currentFilter);
+      });
+
+      $("#top").on('click', function(e){
+        currentFilter = 'top';
+        loadData(0, currentFilter);
+      });
+
+    function loadData(_currentResult, filter, append){
+      $.ajax({
+          url:"{% url 'load_more' %}",
+          type: 'GET',
+          data:{
+            'offset': _currentResult,
+            'filter': filter,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          dataType:'json',
+          beforeSend:function(){
+            $("#loadmoreBtn").addClass('disabled').text('Loading...')
+          },
+          success:function(res){
+            var _html='';
+            var json_data=$.parseJSON(res.posts);
+            $.each(json_data, function(index, data){
+              _html+='<listli class="p-2 post-box">\
+                <a href="/view-single/'+data.pk+'"><img src=/image/'+data.fields.image+' class="wow-image" alt="thumbnail"></a>\
+            </listli>';
+            });
+            if(append){
+            $(".post-wrapper").append(_html);
+            }else{
+            $(".post-wrapper").html(_html);}
+            var _countTotal=$(".post-box").length;
+            console.log(_countTotal + "total count");
+            console.log(res.totalResult + "total REaulst");
+            if(_countTotal==res.totalResult){
+                $("#loadmoreBtn").remove(); 
+            }else{
+                $("#loadmoreBtn").removeClass('disabled').html('Load More') 
+            }
+          }
+        });
+    }
+
+  </script>
+
+  <!-------Search-Button-Ajax------->
+
+  <script>
+
+  $("#search").on('click', function(e){
+    var option = $().val();
+    console.log("option : " + option + "... before ajax call")
+
+    $.ajax({
+      url: '/search/' + option,
+      dataType: "json",
+      success: function (data){
+
+      }
+    })
+  })
+
+  </script>
+
+
+
+{% endblock %}

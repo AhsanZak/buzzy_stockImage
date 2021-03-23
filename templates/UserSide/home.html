@@ -147,25 +147,5 @@
 
   </script>
 
-  <!-------Search-Button-Ajax------->
-
-  <script>
-
-  $("#search").on('click', function(e){
-    var option = $().val();
-    console.log("option : " + option + "... before ajax call")
-
-    $.ajax({
-      url: '/search/' + option,
-      dataType: "json",
-      success: function (data){
-
-      }
-    })
-  })
-
-  </script>
-
-
 
 {% endblock %}

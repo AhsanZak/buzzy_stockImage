@@ -6,13 +6,9 @@ from PIL import Image, ImageDraw
 from imagekit.processors import ResizeToFit
 # Create your models here.
 
-class Category(models.Model):
-    name = models.CharField(max_length=50, null=True, blank=True)
-
 class ImageDetail(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=100, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     price = models.BooleanField(null=True, default=False)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     image_thumbnail = ImageSpecField(source='image', format='JPEG', options={'quality': 8})
@@ -29,3 +25,6 @@ class ImageDetail(models.Model):
         return url
 
 
+class Tags(models.Model):
+    tag = models.CharField(max_length=50, null=True, blank=True)
+    image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, related_name="tag_image", null=True, blank=True)
