@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'AdminPanel',
     'UserSide',
     'imagekit',
+    'social_django',
     'watermarker'
 ]
 
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'Buzzy.urls'
@@ -67,6 +69,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -74,6 +79,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Buzzy.wsgi.application'
 
+
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'home'
+
+
+SOCIAL_AUTH_FACEBOOK_KEY = '263269715158950' 
+SOCIAL_AUTH_FACEBOOK_SECRET = '70b58339b6881e599b89ba1f45b9b676' 
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '21702595792-hp6endfvni2q5dahocd2sgi5so2rn8mu.apps.googleusercontent.com' 
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'kRHhIVL6BdN6kidBThzp-QgM' 
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

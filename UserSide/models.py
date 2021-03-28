@@ -24,7 +24,6 @@ class Creator(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
     date_ordered = models.DateField(auto_now_add=True)
     total_price = models.IntegerField(null=True, blank=True)
     transaction_id = models.CharField(max_length=200, null=True)
@@ -41,7 +40,6 @@ class Wallet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     credits_available = models.IntegerField(null=True, default=0)
     
-
 class Downloads(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
@@ -51,4 +49,23 @@ class Downloads(models.Model):
 class Favourites(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, null=True, blank=True)
+    
+class Plan(models.Model):
+    name = models.CharField(max_length=50, null=True)
+    description =  models.CharField(max_length=200, null=True)
+    price = models.IntegerField(null=True)
+
+
+class WalletTransactions(models.Model):
+    SWANTHAM = 1
+    SADHA = 2
+
+    TRANSACTION_TYPE = ((SWANTHAM, 'Self Payment'), (SADHA, 'Wallet Payment'))
+
+    transaction_name = models.IntegerField(choices=TRANSACTION_TYPE)
+    from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="creditor", on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    amount = models.IntegerField()
+    transaction_id = models.CharField(max_length=200, null=True)
     

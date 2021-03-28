@@ -1,0 +1,53 @@
+{% extends 'AdminPanel/base.html' %}
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Orders</h1>
+          </div>
+
+          <!-- Content Row -->
+          <div class="row">
+          </div>
+
+          <!-- Content Row -->
+
+          <hr>
+
+          <div class="box box-primary p-2">
+            <h4 class="text-primary">Your Orders</h4>
+              <div class="box-body">
+                  <table width="100%" class="table table-hover" id="dataTables-example">
+                      <thead>
+                          <tr>
+                              <th>No.</th>
+                              <th>Date Ordered</th>
+                              <th>User</th>
+                              <th>Plan</th>
+                              <th>Payment Mode</th>
+                              <th>Transaction ID</th>
+                              <th>Plan Price</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for order in orders %}
+                          <tr>
+                              <td>{{forloop.counter}}</td>
+                              <td>{{order.date_ordered}}</td>
+                              <td>{{order.user}}</td>
+                              <td>{{order.plan}}</td>
+                              <td>{{order.payment_mode}}</td>
+                              <td>{{order.transaction_id}}</td>
+                              <td> $ {{order.total_price}}</td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+{% endblock %}

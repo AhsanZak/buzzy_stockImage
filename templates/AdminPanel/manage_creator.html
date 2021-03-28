@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <!-- Earnings (Monthly) Card Example -->
+            <!-- Blocked Creators -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
@@ -45,6 +45,25 @@
                 </div>
               </div>
             </div>
+
+
+            <!-- Top Creators -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">No. of Top Creators</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{top_creators}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-check fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
 
 
           </div>
@@ -85,6 +104,8 @@
                                             <a href="{% url 'delete_user' x.id %}" type="submit" class="btn btn-outline-danger btn-rounded"><i class="fas fa-trash"></i></a>
                                         </td>
                                     </tr>
+                                    {% empty %}
+                                    <h6>No data available at this time</h6>
                                     {% endfor %}
                                 </tbody>
                             </table>

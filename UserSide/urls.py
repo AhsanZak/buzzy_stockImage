@@ -36,9 +36,10 @@ urlpatterns = [
     path('add-favourite/', views.add_favourite, name="add_favourite"),
     path('remove-favourite/', views.remove_favourite, name="remove_favourite"),
 
+    path('orders/', views.orders, name="orders"),
     path('library', views.library, name="library"),
     path('payment-page', views.payment_page, name="payment_page"),
-    path('payment/', views.payment, name="payment"),
+    # path('payment/', views.payment, name="payment"),
 
     path('apply-credit/', views.apply_credit, name="apply_credit"),
     path('user-payment/', views.user_payment, name="user_payment"),

@@ -28,3 +28,17 @@ class ImageDetail(models.Model):
 class Tags(models.Model):
     tag = models.CharField(max_length=50, null=True, blank=True)
     image = models.ForeignKey(ImageDetail, on_delete=models.CASCADE, related_name="tag_image", null=True, blank=True)
+
+
+class WaterMark(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='images/')
+    active = models.BooleanField(default=False)
+
+    @property
+    def ImageURL(self):
+        try:
+            url = self.image.url
+        except ValueError:
+            url = ''
+        return url

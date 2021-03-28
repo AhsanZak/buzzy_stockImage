@@ -1,0 +1,140 @@
+{% extends 'UserSide/base.html' %}
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+
+ <!-- Begin Page Content -->
+ <div class="container-fluid p-5">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Your Payment and Transactions </h1>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+
+      <!-- Total credits Available -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total credits Available</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{credits_available}}</div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Paid Images -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Paid Images</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_downloads}}</div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-download fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buy more Credits -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Buy More Credits</div>
+                <div class="mb-0 f text-gray-800"><a href="{% url 'payment_page' %}">Click here</a></div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-check fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Row -->
+        <hr>
+              <div class="box box-primary p-2">
+                <h4 class="text-primary">Your Orders</h4>
+                  <div class="box-body">
+                      <table width="100%" class="table table-hover" id="dataTables-example">
+                          <thead>
+                              <tr>
+                                  <th>No.</th>
+                                  <th>Date Ordered</th>
+                                  <th>Plan</th>
+                                  <th>Payment Mode</th>
+                                  <th>Transaction ID</th>
+                                  <th>Plan Price</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for order in orders %}
+                              <tr>
+                                  <td>{{forloop.counter}}</td>
+                                  <td>{{order.date_ordered}}</td>
+                                  <td>{{order.plan}}</td>
+                                  <td>{{order.payment_mode}}</td>
+                                  <td>{{order.transaction_id}}</td>
+                                  <td> $ {{order.total_price}}</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+
+            <hr>
+                        <div class="box box-primary p-2">
+                            <h4 class="text-primary">Your Wallet Transactions</h4>
+
+                            <div class="box-body">
+                                <table width="100%" class="table table-hover" id="dataTables-example">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Payment Date</th>
+                                            <th>Type</th>
+                                            <th>Transaction ID</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for transaction in walletTransactions %}
+                                        <tr>
+                                            <td>{{forloop.counter}}</td>
+                                            <td>{{transaction.date}}</td>
+                                            <td>{{transaction.plan}}</td>
+                                            <td>{{transaction.transaction_id}}</td>
+                                            <td> $ 2</td>
+                                        </tr>
+                                        {% empty %}
+                                        <h6>No tranasctions at this moment</h6>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+            </div>
+
+</div>
+
+  <!-- /.container-fluid -->
+
+
+{% endblock %}

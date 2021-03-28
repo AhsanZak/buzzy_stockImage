@@ -12,12 +12,13 @@ from django.http import FileResponse
 import cv2
 import datetime
 from django.db.models import Q
+from django.contrib.auth.hashers import check_password
 
 
 
 def home(request):
     contents = ImageDetail.objects.filter(approval="approved", user__is_staff=True).order_by('-id')
-    paginator = Paginator(contents, 10)
+    paginator = Paginator(contents, 20)
     print(paginator)
     page = request.GET.get('page')
     try:
@@ -33,33 +34,35 @@ def home(request):
         # If page is out of range deliver last page of results
         contents = paginator.page(paginator.num_pages)
 
+    tags = Tags.objects.all().distinct('tag')
+
     if request.is_ajax():
         return render(request,
                       'UserSide/home.html',
-                      {'section': 'contents', 'contents': contents})
+                      {'section': 'contents', 'contents': contents, 'tags':tags})
     return render(request,
                   'UserSide/home.html',
-                  {'section': 'images', 'contents': contents})
+                  {'section': 'images', 'contents': contents, 'tags':tags})
 
 
 def load_more(request):
     offset = int(request.GET['offset'])
     filter = request.GET['filter']
-    limit = 2
+    limit = 20
     if filter == 'all':
-        posts = ImageDetail.objects.all()
+        posts = ImageDetail.objects.filter(approval="approved", user__is_staff=True)
         totalData = len(posts)
         posts = posts[offset:limit + offset]
     elif filter == 'free':
-        posts = ImageDetail.objects.filter(price=False)
+        posts = ImageDetail.objects.filter(price=False, approval="approved", user__is_staff=True)
         totalData = len(posts)
         posts = posts[offset:limit + offset]
     elif filter == 'paid':
-        posts = ImageDetail.objects.filter(price=True)
+        posts = ImageDetail.objects.filter(price=True, approval="approved", user__is_staff=True)
         totalData = len(posts)
         posts = posts[offset:limit + offset]
     elif filter == 'top':
-        posts = ImageDetail.objects.filter(rate__range=(3, 5))
+        posts = ImageDetail.objects.filter(rate__range=(3, 5), approval="approved", user__is_staff=True)
         totalData = len(posts)
         posts = posts[offset:limit + offset]
 
@@ -82,22 +85,43 @@ def contact(request):
     return render(request, 'UserSide/contact.html')
 
 
-def login(request):
+def login(request, backend='django.contrib.auth.backends.ModelBackend'):
     if request.user.is_authenticated:
         print("USer Is Authenticated")
         return redirect(home)
     if request.method == 'POST':
+        print("Request Mehthod is post")
         username = request.POST['username']
         password = request.POST['password']
-        print("Request Method is POST")
-        user = auth.authenticate(username=username, password=password)
 
-        if user is not None:
-            auth.login(request, user)
-            return redirect(home)
+        
+        user = UserDetail.objects.filter(username=username).first()
+
+        if user is not None and check_password(password, user.password):
+            if user.is_active == False:
+                messages.info(request, 'User is Blocked')
+                return render(request, 'UserSide/login.html')
+            else:
+                auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                return redirect(home)
         else:
+            value = {"username": username}
             messages.info(request, "Invalid Credentials")
             return render(request, 'UserSide/login.html')
+
+
+        # user = auth.authenticate(username=username, password=password)
+        # if user is not None:
+        #     print("User is not none")
+        #     if user.is_active == 'false':
+        #         print("user is not avtive ")
+        #         return render(request, 'UserSide/login.html')
+        #     else:
+        #         auth.login(request, user)
+        #         return redirect(home)
+        # else:
+        #     messages.info(request, "Invalid Credentials")
+        #     return render(request, 'UserSide/login.html')
     else:
         print("User is not authentcautered")
         return render(request, 'UserSide/login.html')
@@ -126,7 +150,7 @@ def register(request):
             else:
                 user = UserDetail.objects.create_user(username=username, password=password1, email=email,
                                                       first_name=first_name, last_name=last_name, mobile_number=mobile_number)
-                Wallet.objects.create(user=user)
+                wallet = Wallet.objects.create(user=user)
                 return redirect('login')
         else:
             messages.info(request, "Passwords Not Matching")
@@ -223,11 +247,13 @@ def view_single(request, image_id):
 def view_creator(request, user):
     creator = UserDetail.objects.get(username=user)
     contents = ImageDetail.objects.filter(user=creator)
+    no_of_contents = ImageDetail.objects.filter(user=creator).count()
     creator_bio = Creator.objects.get(user=creator)
     context = {
         'user': creator, 
         'contents': contents, 
-        'creator_bio': creator_bio
+        'creator_bio': creator_bio,
+        'no_of_contents': no_of_contents
     }
     return render(request, 'UserSide/view_creator.html', context)
 
@@ -276,7 +302,28 @@ def Deactivate_creator(request, user_id):
 def creator(request):
     if request.user.is_authenticated and request.user.is_staff == True:
         no_pending = ImageDetail.objects.filter(user=request.user, approval="pending").count()
-        return render(request, 'UserSide/creator.html', {'no_pending': no_pending})
+        wallet_orders = WalletTransactions.objects.filter(to_user=request.user, transaction_name=WalletTransactions.SADHA)
+        creator_images = ImageDetail.objects.filter(user=request.user)
+        no_downloads = Downloads.objects.filter(image__in=creator_images).count()
+
+        #Total Earning
+        total_earnings = 0
+        for order in wallet_orders:
+            total_earnings += order.amount
+
+        #Earnings per month
+        order_amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for order in wallet_orders:
+            order_amounts[order.date.month - 1] += order.amount
+
+        context = {
+                    'no_pending': no_pending,
+                    'order_amounts': order_amounts,
+                    'no_downloads': no_downloads,
+                    'total_earnings': total_earnings
+                }
+
+        return render(request, 'UserSide/creator.html', context)
     else:
         return redirect(login)
 
@@ -302,12 +349,26 @@ def creator_upload(request):
     if request.user.is_authenticated and request.user.is_staff == True:
         if request.method == 'POST':
             name = request.POST['wallpaper_name']
-            tags = request.POST['tags']
+            tags = request.POST['tags'].upper()
             image = request.FILES['image']
             description = request.POST['description']
             price = request.POST['price']
             print(price)
-
+  
+            # printing original string
+            print("The original string is : " + tags)
+            
+            # initializing punctuations string 
+            punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+            
+            # Removing punctuations in string
+            # Using loop + punctuation string
+            for ele in tags: 
+                if ele in punc: 
+                    tags = tags.replace(ele, "") 
+            
+            # printing result 
+            print("The string after punctuation filter : " + tags) 
 
             tag_list = tags.split()
             print(tag_list)
@@ -329,12 +390,16 @@ def creator_upload(request):
                 for tags in tag_list:
                     Tags.objects.create(tag=tags, image=image_detail)
 
-                logo = cv2.imread("C:/Users/ahsan/OneDrive/Desktop/New folder/python watermark/buzzy_copyright.png")
 
-                h_logo, w_logo, _ = logo.shape
                 img = cv2.imread('static/'+image_detail.ImageURL)
                 h_img, w_img, _ = img.shape
 
+                print("Height and Width of the Image are : ", h_img, w_img)
+
+                watermark = WaterMark.objects.all().first()
+                logo = cv2.imread('static/'+watermark.ImageURL)
+
+                h_logo, w_logo, _ = logo.shape
                 # Get the center of the original. It's the location where we will place the watermark
                 center_y = int(h_img / 2)
                 center_x = int(w_img / 2)
@@ -371,6 +436,87 @@ def creator_upload(request):
         return redirect(login)
 
 
+def otp_login(request):
+    if request.user.is_authenticated:
+        return redirect(home)
+    otp = 1
+    if request.method == 'POST':
+        number = request.POST['mobile']
+        request.session['number'] = number
+        if UserDetail.objects.filter(mobile_no=number).exists():
+            otp = 0
+            url = "https://d7networks.com/api/verifier/send"
+            number = str(91) + number
+            payload = {
+                'mobile': number,
+                'sender_id': 'SMSINFO',
+                'message': 'Your otp code is {code}',
+                'expiry': '900'}
+            files = [
+            ]
+            headers = {
+                'Authorization': 'Token b76a52adeb253e2dbb98dd2378d542f8d53fbe6b'
+            }
+            response = requests.request("POST", url, headers=headers, data=payload, files=files)
+            data = response.text.encode('utf8')
+            datadict = json.loads(data)
+            id = datadict['otp_id']
+            request.session['id'] = id
+
+            return render(request, 'User/otplogin.html', {'otp': otp})
+        else:
+            messages.info(request, "Please enter registered Number")
+            return render(request, 'User/otplogin.html', {'otp': otp})
+    else:
+        return render(request, 'User/otplogin.html', {'otp': otp})
+
+
+def verify_otp(request):
+    if request.user.is_authenticated:
+        return redirect(home)
+    else:
+        if request.method == 'POST':
+            otp = request.POST['otp']
+            id_otp = request.session['id']
+            url = "https://d7networks.com/api/verifier/verify"
+            payload = {'otp_id': id_otp,
+                       'otp_code': otp}
+            files = [
+
+            ]
+            headers = {
+                'Authorization': 'Token b76a52adeb253e2dbb98dd2378d542f8d53fbe6b'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload, files=files)
+            data = response.text.encode('utf8')
+            datadict = json.loads(data)
+            status = datadict['status']
+
+            if status == 'success':
+                number = request.session['number']
+                user_detail = UserDetail.objects.filter(mobile_no=number).first()
+                user = user_detail.user
+                print(user)
+                if user_detail is not None:
+                    if user_detail.user.is_active == False:
+                        messages.info(request, 'User is blocked')
+                        return redirect(login)
+
+                    else:
+                        auth.login(request, user)
+                        return redirect(home)
+                else:
+                    return redirect(login)
+
+            else:
+                messages.error(request, 'User not Exist')
+                return redirect(login)
+
+        else:
+            return HttpResponse("Oops")
+
+
 def creator_settings(request):
     pass
 
@@ -379,7 +525,12 @@ def profile_settings(request):
     if request.user.is_authenticated:
         username = request.user
         profile = UserDetail.objects.filter(username=username)
-        credits_available = Wallet.objects.get(user=request.user)
+
+        try:
+            credits_available = Wallet.objects.get(user=request.user)
+        except:
+            credits_available = Wallet.objects.create(user=request.user)
+
         try:
             creator_bio = Creator.objects.get(user=request.user)
         except ObjectDoesNotExist:
@@ -397,18 +548,20 @@ def profile_settings(request):
 
 def edit_userProfile(request):
     if request.user.is_authenticated:
+        print(request.user)
         if request.method == 'POST':
             user = request.user
             user_image = request.FILES.get('imageInput')
-            creator_bio = request.POST['bio']
 
-            try:
-                Creator.objects.get(user=user)
-                bio = Creator.objects.get(user=user)
-                bio.bio = creator_bio
-                bio.save()
-            except ObjectDoesNotExist:
-                pass
+            if request.user.is_staff == True:
+                try:
+                    bio = Creator.objects.get(user=user)
+                    
+                except ObjectDoesNotExist:
+                    Creator.objects.create(user=user)
+                    bio = Creator.objects.get(user=user)
+                bio.bio = request.POST['bio']
+                bio.save()   
 
             if user_image is not None:
                 user_profile = UserDetail.objects.filter(username=user)
@@ -445,8 +598,8 @@ def download_image(request):
 
 def payment_page(request):
     if request.user.is_authenticated:
-        print("lalala")
-        return render(request, 'UserSide/payment.html')
+        plans = Plan.objects.all()
+        return render(request, 'UserSide/payment.html', {'plans': plans})
     else:
         return redirect(login)
 
@@ -462,6 +615,23 @@ def add_comment(request):
     else:
         result = "failed"
         return JsonResponse({'result': result}, safe=False)
+
+
+def orders(request):
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(user=request.user)
+        walletTransactions = WalletTransactions.objects.filter(from_user=request.user, transaction_name=WalletTransactions.SADHA).distinct('transaction_id')
+        credits_available = Wallet.objects.get(user=request.user)
+        no_downloads = Downloads.objects.filter(user=request.user).count()
+        context = {
+            'orders': orders,
+            'walletTransactions': walletTransactions,
+            'credits_available': credits_available.credits_available,
+            'no_downloads': no_downloads
+        }
+        return render(request, 'UserSide/orders.html', context)
+    else:
+        return redirect(login)
 
 
 def library(request):
@@ -481,11 +651,17 @@ def apply_credit(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             image_id = request.POST['id']
+            print(request.user)
             wallet = Wallet.objects.get(user=request.user)
             print(wallet.credits_available)
             if wallet.credits_available >= 1:
+
+                transaction_id = uuid.uuid4()
+
                 image = ImageDetail.objects.get(id=image_id)
-                wallet.credits_available -= 1
+
+                #Deducting the amount from the user
+                wallet.credits_available -= 2
                 wallet.save()
                 
                 print("This is the user : ", request.user)
@@ -493,7 +669,21 @@ def apply_credit(request):
                 creator = image.user
                 print("This is creator : ", creator)
 
-                creator_wallet = Wallet.objects.get(user=creator)
+                
+
+                #Adding 50% payment to admin               
+                WalletTransactions.objects.create(from_user=request.user, to_user=UserDetail.objects.get(is_superuser=True), transaction_name=WalletTransactions.SADHA, amount=1, transaction_id=transaction_id)
+                admin = UserDetail.objects.get(username="admin")
+                admin_wallet = Wallet.objects.get(user=admin)
+                admin_wallet.credits_available += 1
+                admin_wallet.save()
+                print("Admin Wallet : ", admin_wallet.credits_available)
+
+                creator_wallet = Wallet.objects.get(user=creator)   
+                #Adding 50% of the payment to creator
+                WalletTransactions.objects.create(from_user=request.user, to_user=creator, transaction_name=WalletTransactions.SADHA, amount=1, transaction_id=transaction_id)
+                creator_wallet.credits_available += 1
+                creator_wallet.save()
                 print("Creator Wallet : ", creator_wallet.credits_available)
 
                 Downloads.objects.create(user=request.user, image=image)
@@ -542,47 +732,57 @@ def user_payment(request):
         if request.method == 'POST':
             user = request.user
             mode = request.POST['mode']
+            plan = request.POST['plan']
+
+            option = Plan.objects.get(name=plan)
+            amount = option.price
+
             transaction_id = uuid.uuid4()
             if mode == 'Paypal':
-                return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+                return JsonResponse({'mode': mode, 'tid': transaction_id, 'amount': amount}, safe=False)
             elif mode == 'Razorpay':
-                return JsonResponse({'mode': mode, 'tid': transaction_id}, safe=False)
+                return JsonResponse({'mode': mode, 'tid': transaction_id, 'amount': amount}, safe=False)
     else:
         return redirect(login)
 
 
 def success_razorpay(request):
     if request.user.is_authenticated:
-        date = datetime.datetime.now()
-        user = request.user
-        mode = 'Razorpay'
-        tid = request.POST['tid']
-        plan = request.POST['plan']
-        print(plan)
-        print("debofer succsess")
-        if Wallet.objects.get(user=request.user).exists():
-            Wallet.objects.get(user=request.user)
-        else:
-            Wallet.objects.create(user=request.user, plan=plan)
+        if request.method == "POST":
+            date = datetime.datetime.now()
+            user = request.user
+            mode = 'Razorpay'
+            tid = request.POST['tid']
+            plan = request.POST['plan']
 
-        if plan == 'Single':
-            print(type(Wallet))
-            Wallet.credits_available = Wallet.credits_available + 1
-            Wallet.credits_available.save()
-        elif plan == 'Personal':
-            Wallet.credits_available = Wallet.credits_available + 5
-            Wallet.credits_available.save()
-        elif plan == 'Professional':
-            Wallet.credits_available = Wallet.credits_available + 15
-            Wallet.credits_available.save()
-        elif plan == 'Business':
-            Wallet.credits_available = Wallet.credits_available + 30
-            Wallet.credits_available.save()
+            try:
+                Wallet.objects.get(user=request.user)
+            except ObjectDoesNotExist:
+                Wallet.objects.create(user=request.user)
+                
+            wallet = Wallet.objects.get(user=request.user)
+            print(request,'gerrrrr')
+            user = request.user
+
+            print("Plan _________________", plan)
+
+            if plan == "Personal":
+                price = 10
+            elif plan == "Professional":
+                price = 30
+            elif plan == "Business":
+                price = 60
+            elif plan == "Single Image":
+                price = 2
+
+            Order.objects.create(user=request.user, transaction_id=tid, total_price=price, payment_mode=mode, plan=plan)
+            WalletTransactions.objects.create(from_user=request.user, to_user=request.user, transaction_name=WalletTransactions.SWANTHAM, amount=price, transaction_id=uuid.uuid4())
+            wallet.credits_available = wallet.credits_available + price
+
+            wallet.save()
             
-        Order.objects.create(user=user, transaction_id=tid, date_ordered=date, payment_mode=mode, total_price=2, plan=plan)
-        
-        print("Success")
-        return JsonResponse('success', safe=False)
+            print("Success")
+            return JsonResponse('success', safe=False)
     else:
         return redirect(login)
 
@@ -603,27 +803,4 @@ def success_paypal(request):
         return redirect(login)
 
 
-def payment(request):  
-    if request.method == "POST":
-        try:
-            Wallet.objects.get(user=request.user)
-        except ObjectDoesNotExist:
-            Wallet.objects.create(user=request.user)
-        plan = request.POST["option"]
-        print(plan)
-        wallet = Wallet.objects.get(user=request.user)
-        print(request,'gerrrrr')
-        user = request.user
-        if plan == "Personal":
-            wallet.credits_available = wallet.credits_available + 5
-        elif plan == "Professional":
-            wallet.credits_available = wallet.credits_available + 15
-        elif plan == "Business":
-            wallet.credits_available = wallet.credits_available + 30
-        elif plan == "Single":
-            wallet.credits_available = wallet.credits_available + 1
-        wallet.save()
-        
-        return JsonResponse('success', safe=False)
-    print("Error")
 

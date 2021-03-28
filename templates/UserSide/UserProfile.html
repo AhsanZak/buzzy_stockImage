@@ -1,6 +1,6 @@
 {% extends 'UserSide/base.html' %}
 {% block title %}Profile{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="container bootstrap snippet mb-5">
     <div class="row">
@@ -28,7 +28,8 @@
                                         <h6 style="color:#FF5722;">Upload Profile Image</h6>
                                     </label>
                                     <input type="file" name="imageInput" id="imageInput" value="Upload" placeholder=""
-                                        class="foo">
+                                        class="foo" style="display: none;">
+                                        <img style="height: 2em; width: 2em;" id="upload-icon" onclick="openImage()" src="{% static 'image/upload-icon.png' %}">
                                 </div>
                             </div>
                         </div>
@@ -102,7 +103,7 @@
             <div class="card text-center" style="width: 18rem;">
                 <div class="card-body">
                     <h5 class="card-title">Credits Available</h5>
-                    <p class="card-text">{{credits_available.credits_available}}</p>
+                    <p class="card-text">${{credits_available.credits_available}}</p>
                     <a href="{% url 'payment_page' %}" class="btn btn-primary">Buy More</a>
                 </div>
             </div>
@@ -145,6 +146,10 @@
 
 <!----Image Preview While selection --->
 <script>
+    function openImage(){
+        $('#imageInput').click()
+    }
+
     const imageInput = document.getElementById("imageInput");
     const previewContainer = document.getElementById("imagePreview");
     const previewImage = previewContainer.querySelector(".image-preview__image");

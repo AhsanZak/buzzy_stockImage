@@ -6,7 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="shortcut icon" href="{% static 'image/icon.png' %}">  
+  <title>Buzzy | Creator Dashboard</title>
 
 
   <!-- Custom fonts for this template-->
@@ -26,10 +27,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: #343a40!important">
         <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
         <div class="flex-grow-1 d-flex">
-            <form class="form-inline mx-0 mx-lg-auto rounded">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+          <form class="form-inline mx-0 mx-lg-auto rounded" action="{% url 'search' %}" style="width: 100%;">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search" >
+            <button class="btn btn-outline-success" type="submit" >Search</button>
+        </form>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -47,6 +48,7 @@
               </a>
               <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              <a class="dropdown-item" href="{% url 'orders' %}">Orders</a>
               {% if request.user.is_staff == True %}
               <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
               {% endif %}
@@ -150,8 +152,6 @@
                                         <th>Image</th>
                                         <th>Tags</th>
                                         <th>Download Type</th>
-                                        <th>Rating</th>
-                                        <th>Total Downloads</th>
                                         <th>Admin Approval</th>
                                         <th></th>
                                     </tr>
@@ -171,8 +171,6 @@
                                             Paid
                                         {% endif %}
                                         </td>
-                                        <td>5*</td>
-                                        <td>766</td>
                                         <td>
                                         {% if x.approval == "approved" %}
                                             <button type="button" class="btn btn-success disabled">Approved</button>

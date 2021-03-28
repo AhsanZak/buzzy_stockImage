@@ -6,7 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="shortcut icon" href="{% static 'image/icon.png' %}">  
+  <title>Buzzy | Creator Dashboard</title>
 
 
   <!-- Custom fonts for this template-->
@@ -32,10 +33,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: #343a40!important">
       <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
       <div class="flex-grow-1 d-flex">
-        <form class="form-inline mx-0 mx-lg-auto rounded">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+        <form class="form-inline mx-0 mx-lg-auto rounded" action="{% url 'search' %}" style="width: 100%;">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search" >
+          <button class="btn btn-outline-success" type="submit" >Search</button>
+      </form>
       </div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +57,7 @@
             </a>
             <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              <a class="dropdown-item" href="{% url 'orders' %}">Orders</a>
               {% if request.user.is_staff == True %}
               <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
               {% endif %}
@@ -161,7 +163,9 @@
                   </div>
 
                   <label>Upload Image</label>
-                  <input type="file" placeholder="Upload Image" name="image" id="image" accept="image/*" required>
+                  <input type="file" name="image" id="image" value="Upload" placeholder=""
+                  class="foo" accept="image/*" required style="display: none;">
+                  <img style="height: 2em; width: 2em;" id="upload-icon" onclick="openImage()" src="{% static 'image/upload-icon.png' %}">
 
                   <div class="form-group">
                     <input type="text" class="form-control" name="description" id="description"
@@ -185,7 +189,12 @@
             </div>
 
             <div class="col-md-6">
-
+              <div class="form-group image-preview" id=imagePreview>
+                <img id="image"
+                    name="image" src="{{x.ImageURL}}"
+                    class="image-preview__image avatar img-circle img-thumbnail" alt="Choose an Image for Preview">
+                <span class="image-preview__default-text"></span>
+            </div>
             </div>
           </div>
           <!-- Content Row -->
@@ -249,6 +258,9 @@
   <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
 
   <script>
+    function openImage(){
+        $('#image').click()
+    }
 
     $('#upload').click(function () {
       console.log("askdjflaskjalskdjflsksdj")
@@ -300,6 +312,39 @@
     })
 
   </script>
+
+  
+<!----Image Preview While selection --->
+<script>
+  const image = document.getElementById("image");
+  const previewContainer = document.getElementById("imagePreview");
+  const previewImage = previewContainer.querySelector(".image-preview__image");
+  const previewDefaultText = previewContainer.querySelector(".image-preview__default-text");
+
+  image.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+          const reader = new FileReader();
+
+          previewDefaultText.style.display = "none";
+          previewImage.style.display = "block";
+
+          reader.addEventListener("load", function () {
+              console.log(this);
+              previewImage.setAttribute("src", this.result);
+
+          });
+
+          reader.readAsDataURL(file);
+
+      } else {
+          previewDefaultText.style.display = null;
+          previewImage.style.display = null;
+          previewImage.setAttribute("src", "{{product.ImageURL}}");
+      }
+  });
+</script>
+
 
 </body>
 

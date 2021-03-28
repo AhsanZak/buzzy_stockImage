@@ -67,15 +67,16 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     <div class="col-lg-8 col-md-8 col-sm-7 col-xs-12">
                         <div class="box">
                             <h3 class="box-title widget-title">Select Your Download Plan</h3>
-
+                            {% for plan in plans %}
                             <div class="plan-selection">
                                 <div class="plan-data">
-                                    <input id="question1" name="question" type="radio" class="with-font" value="Single" />
-                                    <label for="question1">Single Image</label>
-                                    <p class="plan-text"> 1 Image | Time Limit : Unlimited</p>
-                                    <span class="plan-price">$ 2</span>
+                                    <input id="question-{{plan.id}}" name="question" type="radio" class="with-font" value="{{plan.name}}" />
+                                    <label for="question-{{plan.id}}">{{plan.name}}</label>
+                                    <p class="plan-text"> {{plan.description}}</p>
+                                    <span class="plan-price">$ {{plan.price}}</span>
                                 </div>
                             </div>
+                            {% endfor %}
                             <div class="plan-selection">
                                 <div class="plan-data">
                                     <input id="question2" name="question" type="radio" class="with-font" value="Personal" />
@@ -83,21 +84,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                                     <p class="plan-text"> 5 Images | Time Limit : Unlimited</p>
                                     <span class="plan-price">$ 10</span>
                                 </div>
-                            </div> <div class="plan-selection">
-                                <div class="plan-data">
-                                    <input id="question3" name="question" type="radio" class="with-font" value="Professional" />
-                                    <label for="question3">Professional</label>
-                                    <p class="plan-text"> 15 Images | Time Limit : Unlimited</p>
-                                    <span class="plan-price">$ 30</span>
-                                </div>
-                            </div> <div class="plan-selection">
-                                <div class="plan-data">
-                                    <input id="question4" name="question" type="radio" class="with-font" value="Business" />
-                                    <label for="question4">Business</label>
-                                    <p class="plan-text"> 30 Images | Time Limit : Unlimited</p>
-                                    <span class="plan-price">$ 60</span>
-                                </div>
-                            </div>
+                            </div>  
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
@@ -116,19 +103,18 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                                 <div class="col-md-12" style="align-items: center;">
                                     <input id="confirm" type="button" value="Confirm" style="width: 100%;" class="btn btn-primary">
                                 </div>
-                            </div>
-                            
+                            </div> 
                         </div>
 
 
-                        <!-- <div class="widget" id="payment-container" style="display:none">
+                        <div class="widget" id="payment-container" style="display:none">
                             <h4 class="widget-title">Pay Using : </h4>
                             <div class="">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <!-- <div class="col-md-12">
                                         <input type="radio" id="paypal" name="mode" value="Paypal" required>
                                         <label for="Paypal" style="color: orange;">Paypal</label><br>
-                                    </div>
+                                    </div> -->
                                     <div class="col-md-12">
                                         <input type="radio" id="razorpay" name="mode" value="Razorpay" required>
                                         <label for="razorpay" style="color: orangered;">RazorPay</label><br>
@@ -145,10 +131,8 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                                 </div>
                                 <input type="hidden" custom='Hidden Element' name="hidden">
                             </div>
-                        </div> -->
-
-
-                        <a class="btn btn-primary"  id="pay" type="button">Pay</a>                     
+                        </div>
+                 
                     </div>
                 </div>
         
@@ -161,34 +145,35 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script
     src="https://www.paypal.com/sdk/js?client-id=AZ-zxKIWEzxYNP6RHnvei07eMWgRneZlEtCTRKXVnMBYSkZISPFsw0Y8WwftjBOb6n0BLn1x9mvFYN4X&currency=USD"
-    data-namespace="paypal_sdk"></script>
-    <script src="https://code.jquery.com/jquery-3.5.0.min.js"
-    integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    data-namespace="paypal_sdk">
+</script>
+<script src="https://code.jquery.com/jquery-3.5.0.min.js" 
+    integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" 
+    crossorigin="anonymous">
+</script>
 
 <script>
 
-
-    $('#pay').click(function () {
-        var userData = {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                option: $("input[name='question']:checked").val()
-            }
-        console.log(userData.option)
-        $.ajax({
-            url: '/payment/',
-            type: "POST",
-            data: userData,
-            dataType: "JSON",
-            success: function (data) {
-                console.log(data)
-                if (data == 'success'){
-                    console.log(data)
-                    window.location.replace("/")
-                }
-            }
-        });
-    });
-
+    // $('#pay').click(function () {
+    //     var userData = {
+    //             csrfmiddlewaretoken: '{{ csrf_token }}',
+    //             option: $("input[name='question']:checked").val()
+    //         }
+    //     console.log(userData.option)
+    //     $.ajax({
+    //         url: '/payment/',
+    //         type: "POST",
+    //         data: userData,
+    //         dataType: "JSON",
+    //         success: function (data) {
+    //             console.log(data)
+    //             if (data == 'success'){
+    //                 console.log(data)
+    //                 window.location.replace("/")
+    //             }
+    //         }
+    //     });
+    // });
 
     var amount = 0  
     function paypal(tid) {
@@ -238,7 +223,6 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
         });
     }
 
-
     $('#order').click(function () {
         var userData = {
             csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -262,18 +246,18 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     console.log(data.mode)
                     tid = data.tid
                     $('#order').hide()
-                    razorpay(tid, userData.plan)
+                    razorpay(tid, userData.plan, data.amount)
                     amount = data.amount
                 }
             }
         });
     });
 
-    function razorpay(tid, plan) {
+    function razorpay(tid, plan, amount) {
         console.log(tid)
-        console.log(plan)
+        console.log("Plan Selected : : ", plan)
 
-        var total = 1 * 7000
+        var total = amount * 7000
         var payment_status = 'razorpay'
         var options = {
             "key": "rzp_test_U3zNUwvRlxDktr", // Enter the Key ID generated from the Dashboard
@@ -308,6 +292,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
             tid: tid,
             plan: plan
         }
+        console.log("The plan is : "+ plan)
         $.ajax({
             url: '/success-razorpay/',
             type: "POST",
@@ -323,11 +308,11 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
     }
 
     $(document).ready(function(){
-        $("input").change(function(){
+        $("input[name='question']").change(function(){
             option = $("input[name='question']:checked")
             console.log("This is option : " + option.parent().children().eq(3).text())
-            $('#selected-option').text(option.val())
 
+            $('#selected-option').text(option.val())
             price = $(this).parent().children().eq(3).text();
             $('#total-amount').text(price)
 
@@ -335,8 +320,6 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
 
         });
     });
-
-
 
     $('#confirm').click(function () {
         var userData = {
@@ -365,7 +348,6 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
                     console.log(data.mode)
                     tid = data.tid
                     $('#order').hide()
-                    print("hereereerererererererererer")
                     razorpay(tid, userData.option)
                     amount = data.amount
                 }
@@ -373,9 +355,7 @@ input[type=radio].with-font:focus~label:before, input[type=checkbox].with-font:f
         });
     });
 
-
-
-$('#apply-credit').click(function () {
+    $('#apply-credit').click(function () {
         let credit_option = $('#credit_option').val()
         console.log(credit_option)
         var creditInfo = {

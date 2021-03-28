@@ -9,6 +9,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="{% static 'image/icon.png' %}">  
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -20,6 +21,9 @@
 
   <!-- Custom styles for this template-->
   <link href="{% static 'AdminPanel/css/sb-admin-2.min.css' %}" rel="stylesheet">
+  <link href="{% static 'AdminPanel/vendor/DataTables/datatables.min.css' %}" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+
 
 </head>
 
@@ -79,7 +83,6 @@
             <h6 class="collapse-header">Manage Creators</h6>
             <a class="collapse-item" href="{% url 'add_creator' %}">Add new Creator</a>
             <a class="collapse-item" href="{% url 'manage_creator' %}">Manage Creator</a>
-            <a class="collapse-item" href="">Sent Alerts</a>
           </div>
         </div>
       </li>
@@ -92,7 +95,22 @@
         Contents
       </div>
 
-      <!-- Nav Item - Pages Collapse Menu -->
+      <!-- Upload Watermarks -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseWatermark" aria-expanded="true" aria-controls="collapsePages">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>Add Watermark</span>
+        </a>
+        <div id="collapseWatermark" class="collapse" aria-labelledby="headingWatermark" data-parent="#accordionSidebar">
+           <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header"></h6>
+            <a class="collapse-item" href="{% url 'watermark' %}">Manage Watermarks</a>
+            <div class="collapse-divider"></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Manage Contents  -->
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
           <i class="fas fa-fw fa-folder"></i>
@@ -102,10 +120,24 @@
            <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header"></h6>
             <a class="collapse-item" href="{% url 'contents' %}">Contents</a>
-            <a class="collapse-item" href="{% url 'category' %}">Category</a>
             <a class="collapse-item" href="{% url 'add_contents' %}">Add a new Content</a>
             <a class="collapse-item" href="{% url 'approve_contents' %}">Approve Contents</a>
             <a class="collapse-item" href="{% url 'disapprove_contents' %}">Disapprove Contents</a>
+            <div class="collapse-divider"></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Manage Orders -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOrders" aria-expanded="true" aria-controls="collapseOrders">
+          <i class="fas fa-fw fa-folder"></i>
+          <span>Manage Orders</span>
+        </a>
+        <div id="collapseOrders" class="collapse" aria-labelledby="headingOrdees" data-parent="#accordionSidebar">
+           <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header"></h6>
+            <a class="collapse-item" href="{% url 'admin_orders' %}">Orders</a>
             <div class="collapse-divider"></div>
           </div>
         </div>
@@ -165,8 +197,8 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
-                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{request.user.first_name}}</span>
+                <img class="img-profile rounded-circle" style="border: 2px solid rgb(135, 70, 255);" src="{{request.user.ImageURL}}">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -244,6 +276,10 @@
     </div>
   </div>
 
+  <script>
+
+  </script>
+
   <!-- Bootstrap core JavaScript-->
   <script src="{% static 'AdminPanel/vendor/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'AdminPanel/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -261,6 +297,110 @@
   <script src="{% static 'AdminPanel/js/demo/chart-area-demo.js' %}"></script>
   <script src="{% static 'AdminPanel/js/demo/chart-pie-demo.js' %}"></script>
 
+
+  <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable();
+    } );
+  </script>
+
+
+<script>
+  
+// Area Chart Example
+var ctx = document.getElementById("myAreaChart");
+var myLineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [{
+      label: "Earnings",
+      lineTension: 0.3,
+      backgroundColor: "rgba(78, 115, 223, 0.05)",
+      borderColor: "rgba(78, 115, 223, 1)",
+      pointRadius: 3,
+      pointBackgroundColor: "rgba(78, 115, 223, 1)",
+      pointBorderColor: "rgba(78, 115, 223, 1)",
+      pointHoverRadius: 3,
+      pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+      pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+      pointHitRadius: 10,
+      pointBorderWidth: 2,
+      data: JSON.parse('{{order_amounts}}'),
+    }],
+  },
+  options: {
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        left: 10,
+        right: 25,
+        top: 25,
+        bottom: 0
+      }
+    },
+    scales: {
+      xAxes: [{
+        time: {
+          unit: 'date'
+        },
+        gridLines: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          maxTicksLimit: 7
+        }
+      }],
+      yAxes: [{
+        ticks: {
+          maxTicksLimit: 5,
+          padding: 10,
+          // Include a dollar sign in the ticks
+          callback: function(value, index, values) {
+            return '$' + number_format(value);
+          }
+        },
+        gridLines: {
+          color: "rgb(234, 236, 244)",
+          zeroLineColor: "rgb(234, 236, 244)",
+          drawBorder: false,
+          borderDash: [2],
+          zeroLineBorderDash: [2]
+        }
+      }],
+    },
+    legend: {
+      display: false
+    },
+    tooltips: {
+      backgroundColor: "rgb(255,255,255)",
+      bodyFontColor: "#858796",
+      titleMarginBottom: 10,
+      titleFontColor: '#6e707e',
+      titleFontSize: 14,
+      borderColor: '#dddfeb',
+      borderWidth: 1,
+      xPadding: 15,
+      yPadding: 15,
+      displayColors: false,
+      intersect: false,
+      mode: 'index',
+      caretPadding: 10,
+      callbacks: {
+        label: function(tooltipItem, chart) {
+          var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+          return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+        }
+      }
+    }
+  }
+});
+
+</script>
 </body>
 
 </html>

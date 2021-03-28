@@ -266,21 +266,12 @@
                     <div class="dropdown-menu">
                         <h6 class="text-center">Choose a size</h6>
                         <div class="dropdown-divider"></div>
-                        <div class="radio dropdown-item">
-                            <input type="radio" name="dimensions" value="original"><span style="color: gray;"
-                                id="original"></span>
-                        </div>
-                        <div class="radio dropdown-item">
-                            <input type="radio" name="dimensions" value="large"><span style="color: gray;"
-                                id="large"></span>
-                        </div>
-                        <div class="radio dropdown-item">
-                            <input type="radio" name="dimensions" value="medium"><span style="color: gray;"
-                                id="medium"></span>
-                        </div>
-                        <div class="radio dropdown-item">
-                            <input type="radio" name="dimensions" value="small"><span style="color: gray;"
-                                id="small"></span>
+                        <div id="image-options">
+                            <div class="radio dropdown-item">
+                                <input type="radio" name="dimensions" value="original"><span style="color: gray;"
+                                    id="original"></span>
+                            </div>
+
                         </div>
                         <div class="dropdown-divider"></div>
                         <div class="radio dropdown-item">
@@ -301,10 +292,7 @@
                     <span class="fa fa-star {% if content.rate >= 5 %} checked {% endif %}"></span>
                 </div>
 
-                <p>{{content.description}}Another rainy day here
-                    today - off for my Sunday run - at least it won't be hot - LOL.
-                    Thanks for
-                    stopping by - will be by to see you all when I return.</p>
+                <p>{{content.description}}</p>
 
                 <h6>Uploded By : <a href="{% url 'view_creator' content.user %}"
                         style="text-decoration: none;">{{content.user}}</a></h6>
@@ -321,6 +309,7 @@
                     {% if favourite == 1 %}
                         <div class="col-xs-4 p-2">
                             <a class="btn btn-primary" href="" id="add-favourite">Remove</a>
+
                         </div>
                     {% else %}
                         <div class="col-xs-4 p-2">
@@ -498,7 +487,8 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#large').html(" Large (" + parseInt(width) + " X " + parseInt(height) + ")")
+                var option = "Large"
+                addRow(option)
 
             case width >= 1280:
                 console.log("Medium Image quality is available")
@@ -516,7 +506,8 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#medium').html(" Medium (" + parseInt(width) + " X " + parseInt(height) + ")")
+                var option = "Medium"
+                addRow(option)
 
             case width >= 640:
                 console.log("Small Image quality is available")
@@ -534,11 +525,25 @@
                         height = MAX_HEIGHT;
                     }
                 }
-                $('#small').html(" Small (" + parseInt(width) + " X " + parseInt(height) + ")")
-
+                var option = "Small"
+                addRow(option)
             default:
             // code block
         }
+
+        function addRow(option) {
+            console.log("lllalllallla", option)
+            const div = document.createElement('div');
+            console.log("funcition called ")
+            console.log(width)
+            console.log(height)
+            div.className = 'radio dropdown-item';
+            div.innerHTML = '\
+                <input type="radio" name="dimensions" value="'+option+'"><span style="color: gray;"> '+option+' (' + parseInt(width) + ' X ' + parseInt(height) + ')</span>\
+            '
+            document.getElementById('image-options').appendChild(div);
+            }
+
 
 
     });
@@ -570,7 +575,7 @@
         console.log("Image dimensions clicked ")
 
         var option = $("input[name='dimensions']:checked").val()
-        console.log(option)
+        console.log("This is the optiion clicked : " + option)
         var img = document.createElement("img");
         img.src = "{{content.ImageURL}}";
 
@@ -578,15 +583,15 @@
             console.log("option selected original ")
             var width = img.width;
             ResizeImage(width)
-        } else if (option == "large") {
+        } else if (option == "Large") {
             console.log("Large option Selected")
             var width = "1920"
             ResizeImage(width)
-        } else if (option == "medium") {
+        } else if (option == "Medium") {
             console.log("Medium option selected")
             var width = "1280"
             ResizeImage(width)
-        } else if (option == "small") {
+        } else if (option == "Small") {
             console.log("small option selected")
             var width = "640"
             ResizeImage(width)
@@ -651,6 +656,7 @@
                 if (data == 'success') {
                     console.log("Sucess")
                     $('#success-download').html('Image is added to your Library. You can download it from there ...!')
+                    window.location.reload()
                 } else if(data == 'failed') {
                     console.log("failed")
                     $('#error-download').html('Ooops..! Looks like you dont have enough credits.')
@@ -713,6 +719,8 @@
     })
     // Image Resizing
     function ResizeImage(width) {
+
+        console.log("Resize FUnction is Called hereeer")
 
         // Create an image
         var img = document.createElement("img");

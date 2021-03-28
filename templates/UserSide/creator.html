@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="shortcut icon" href="{% static 'image/icon.png' %}">  
+  <title>Buzzy | Creator Dashboard</title>
 
 
   <!-- Custom fonts for this template-->
@@ -22,12 +23,12 @@
   
  <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color: #343a40!important">
-        <a class="navbar-brand flex-grow-1" href="/">Buzzy</a>
+        <a class="navbar-brand flex-grow-1" style="font-weight: bold;" href="/">Buzzy</a>
         <div class="flex-grow-1 d-flex">
-            <form class="form-inline mx-0 mx-lg-auto rounded">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+          <form class="form-inline mx-0 mx-lg-auto rounded" action="{% url 'search' %}" style="width: 100%;">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search" >
+            <button class="btn btn-outline-success" type="submit" >Search</button>
+        </form>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -45,6 +46,7 @@
               </a>
               <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              <a class="dropdown-item" href="{% url 'orders' %}">Orders</a>
               {% if request.user.is_staff == True %}
               <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
               {% endif %}
@@ -142,8 +144,8 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1" >Alerts</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">Please Remove the Last uploaded image</div>
+                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1" >No of Downloads</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{no_downloads}}</div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -160,7 +162,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$500</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{total_earnings}}</div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -217,7 +219,33 @@
           <!-- Content Row -->
 
           <div class="row">
-
+            <!-- Area Chart -->
+            <div class="col-xl-8 col-lg-7">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                  <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-area">
+                    <canvas id="myAreaChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
          <!-- Content Row -->
@@ -274,7 +302,106 @@
   <!-- Custom scripts for all pages-->
   <script src="{% static 'AdminPanel/js/sb-admin-2.min.js' %}"></script>
 
+  <!-- Page level plugins -->
+  <script src="{% static 'AdminPanel/vendor/chart.js/Chart.min.js' %}"></script>
 
+  <!-- Page level custom scripts -->
+  <script src="{% static 'AdminPanel/js/demo/chart-area-demo.js' %}"></script>
+  <script src="{% static 'AdminPanel/js/demo/chart-pie-demo.js' %}"></script>
+
+  <script>
+  
+    // Area Chart Example
+    var ctx = document.getElementById("myAreaChart");
+    var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Earnings",
+          lineTension: 0.3,
+          backgroundColor: "rgba(78, 115, 223, 0.05)",
+          borderColor: "rgba(78, 115, 223, 1)",
+          pointRadius: 3,
+          pointBackgroundColor: "rgba(78, 115, 223, 1)",
+          pointBorderColor: "rgba(78, 115, 223, 1)",
+          pointHoverRadius: 3,
+          pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+          pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+          pointHitRadius: 10,
+          pointBorderWidth: 2,
+          data: JSON.parse('{{order_amounts}}'),
+        }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            left: 10,
+            right: 25,
+            top: 25,
+            bottom: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+            time: {
+              unit: 'date'
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            },
+            ticks: {
+              maxTicksLimit: 7
+            }
+          }],
+          yAxes: [{
+            ticks: {
+              maxTicksLimit: 5,
+              padding: 10,
+              // Include a dollar sign in the ticks
+              callback: function(value, index, values) {
+                return '$' + number_format(value);
+              }
+            },
+            gridLines: {
+              color: "rgb(234, 236, 244)",
+              zeroLineColor: "rgb(234, 236, 244)",
+              drawBorder: false,
+              borderDash: [2],
+              zeroLineBorderDash: [2]
+            }
+          }],
+        },
+        legend: {
+          display: false
+        },
+        tooltips: {
+          backgroundColor: "rgb(255,255,255)",
+          bodyFontColor: "#858796",
+          titleMarginBottom: 10,
+          titleFontColor: '#6e707e',
+          titleFontSize: 14,
+          borderColor: '#dddfeb',
+          borderWidth: 1,
+          xPadding: 15,
+          yPadding: 15,
+          displayColors: false,
+          intersect: false,
+          mode: 'index',
+          caretPadding: 10,
+          callbacks: {
+            label: function(tooltipItem, chart) {
+              var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+              return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+            }
+          }
+        }
+      }
+    });
+    
+    </script>
   
 </body>
 </html>

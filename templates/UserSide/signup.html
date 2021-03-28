@@ -1,23 +1,25 @@
 {% extends 'UserSide/base.html' %}
 {% block title %} Signup {% endblock %}
-
+{% load static %}
 {% block content %}
-
-
+<style>
+        body{
+                background-image: url("{% static 'image/paul.jpg' %}");
+        }
+</style>
 
 <div id="login">
-        <h3 class="text-center text-white pt-5">Login form</h3>
-        <div class="container">
+        <div class="container" style="padding-bottom: 11em; padding-top: 5em;">
             <div id="login-row" class="row justify-content-center align-items-center">
-                <div id="login-column" class="col-md-6">
+                <div id="login-column" class="col-md-6" style=" border:  1px solid gray;">
                     <div id="login-box" class="col-md-12">
+                        <h3 class="text-center text-info p-3">Register </h3>
                         {% for message in messages %}
-                        <h5 style="color:red;">{{message}}</h5>
+                        <h6 style="color:red;">{{message}}</h6>
                         {% endfor %}
                         <form id="login-form" class="form" action="{% url 'register' %}" method="POST">
                             {% csrf_token %}
-                            <h3 class="text-center text-info">Register </h3>
-                            <h5 class="text-info">Have an account?<a href="{% url 'login' %}" style="text-decoration:none; color: black;">    Login</a></h5>
+                            <h5 class="text-info">Have an account?<a href="{% url 'login' %}" style="text-decoration:none; color: grey;">    Login</a></h5>
                             <div class="form-group">
                                     <input type="text" name="first_name" class="form-control mb-30" placeholder="First Name" required>
                             </div>
@@ -40,7 +42,7 @@
                                     <input type="password" name="password2" class="form-control mb-30" placeholder="Confirm Password">
                             </div>
                             <div class="form-group text-center">
-                                    <button type="submit" class="btn btn-primary btn-2 mt-15">Register</button>
+                                    <button type="submit" class="btn btn-info btn-2 mt-15">Register</button>
                             </div>
                         </form>
                     </div>

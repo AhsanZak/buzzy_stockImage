@@ -6,10 +6,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'image/icon.png' %}">  
     <title>Buzzy | {% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'User/assets/css/scss.css' %}"/>  
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="{% static 'AdminPanel/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" ></script>
 </head>
 
@@ -121,7 +124,7 @@ border-radius: 10px;
             
 
         <ul class="navbar-nav ml-auto">
-          <list class="nav-item active"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
+          <list class="nav-item"><a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a></list>
           <list class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></list>
           {% if request.user.is_authenticated %}
           <list class="nav-item dropdown" >
@@ -130,6 +133,7 @@ border-radius: 10px;
               </a>
               <div class="dropdown-menu" style="position: absolute; " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{% url 'profile_settings' %}">Settings</a>
+              <a class="dropdown-item" href="{% url 'orders' %}">Orders</a>
               {% if request.user.is_staff == True %}
               <a class="dropdown-item" href="{% url 'creator' %}">Dashboard</a>
               {% endif %}
